@@ -1,0 +1,20 @@
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+tasks.register("buildAll") {
+    dependsOn(
+            ":client:build",
+            "servlet:build"
+    )
+}
+
+tasks.register("runAll") {
+    dependsOn(
+            "servlet:appStart",
+            ":client:run"
+
+    )
+}

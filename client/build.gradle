@@ -1,0 +1,51 @@
+plugins {
+    id 'application'
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+}
+
+application {
+    mainClass = 'rpm.ui.app.RpmApp'
+}
+
+/**
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+ **/
+
+javafx {
+    version = "17.0.10"
+    modules = ['javafx.controls', 'javafx.graphics','javafx.media']
+}
+
+dependencies {
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+
+    //for unit testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
+}
+
+tasks.withType(JavaExec).configureEach {
+    def envUrl = System.getenv("RPM_TELEMETRY_URL")
+    if (envUrl != null && !envUrl.trim().isEmpty()) {
+        systemProperty "rpm.telemetry.url", envUrl.trim()
+    }
+
+    System.properties.each { k, v ->
+        if (k != null && k.toString().startsWith("rpm.telemetry.")) {
+            systemProperty k.toString(), v.toString()
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

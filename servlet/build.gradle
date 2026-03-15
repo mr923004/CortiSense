@@ -1,0 +1,50 @@
+plugins {
+    id 'war'
+    id 'org.gretty' version '3.1.1'
+}
+
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+war {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // zip runtime deps into the WAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+tasks.register('stage') {
+    dependsOn 'clean'
+    dependsOn 'build'
+}
+build.mustRunAfter clean
+
+dependencies {
+
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    implementation "org.postgresql:postgresql:42.7.3"
+    
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    //required for unit testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.8.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+}
+
+test {
+    useJUnitPlatform()
+}

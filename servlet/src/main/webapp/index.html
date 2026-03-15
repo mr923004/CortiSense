@@ -1,0 +1,1465 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Rancho • RPM Reports</title>
+
+    <style>
+        :root{
+            --rancho-blue:#1162aa;
+            --rancho-blue2:#0966ae;
+            --rancho-sky:#55bff1;
+            --rancho-navy:#0b5c9a;
+            --rancho-charcoal:#272827;
+            --rancho-grey:#c8ced6;
+
+            --bg0:#f4fbff;
+            --bg1:rgba(85,191,241,0.22);
+            --bg2:rgba(17,98,170,0.14);
+
+            --card:#fff;
+            --border: rgba(39,40,39,0.10);
+            --muted: rgba(39,40,39,0.70);
+
+            --danger:#b00020;
+            --dangerBg: rgba(176,0,32,0.10);
+
+            --amber:#c98b00;
+            --amberBg: rgba(201,139,0,0.10);
+
+            --shadow: 0 14px 40px rgba(0,0,0,0.10);
+            --shadow2: 0 10px 26px rgba(0,0,0,0.10);
+            --r12: 12px;
+            --r16: 16px;
+        }
+
+        * { box-sizing: border-box; }
+        body{
+            margin:0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--rancho-charcoal);
+            background:
+                    radial-gradient(1200px 600px at 20% 15%, rgba(85,191,241,0.30), transparent 60%),
+                    radial-gradient(900px 500px at 85% 20%, rgba(17,98,170,0.20), transparent 55%),
+                    linear-gradient(to bottom right, var(--bg0) 0%, var(--bg1) 35%, var(--bg2) 100%);
+            min-height: 100vh;
+        }
+
+        header{
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.86);
+            border-bottom: 1px solid rgba(39,40,39,0.08);
+        }
+
+        .header-inner{
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 14px 16px;
+            display:flex;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .brand{
+            display:flex;
+            gap: 12px;
+            align-items: center;
+            min-width: 260px;
+        }
+
+        .brand img{
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid rgba(39,40,39,0.06);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.06);
+        }
+
+        .brand h1{
+            margin:0;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 0.2px;
+            line-height: 1.1;
+        }
+
+        .brand .sub{
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .statusline{
+            display:flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .muted{
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pill{
+            display:inline-flex;
+            align-items:center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(39,40,39,0.10);
+            background: rgba(255,255,255,0.65);
+            font-size: 12px;
+            font-weight: 900;
+            color: rgba(39,40,39,0.80);
+            white-space: nowrap;
+        }
+        .pill.ok{ background: rgba(85,191,241,0.18); border-color: rgba(17,98,170,0.12); color: var(--rancho-blue); }
+        .pill.amber{ background: var(--amberBg); border-color: rgba(201,139,0,0.25); color: #8b5a00; }
+        .pill.red{ background: var(--dangerBg); border-color: rgba(176,0,32,0.22); color: var(--danger); }
+
+        .wrap{
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 16px;
+            display:grid;
+            grid-template-columns: 360px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        @media (max-width: 980px){
+            .wrap{ grid-template-columns: 1fr; }
+        }
+
+        .card{
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(39,40,39,0.10);
+            border-radius: var(--r16);
+            box-shadow: var(--shadow2);
+        }
+
+        .panel{
+            padding: 14px;
+        }
+
+        .report{
+            padding: 14px;
+        }
+
+        .section-title{
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            font-weight: 900;
+            color: rgba(39,40,39,0.78);
+            letter-spacing: 0.2px;
+        }
+
+        .row{
+            display:flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button, select, input{
+            font: inherit;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(200,206,214,0.95);
+            background: rgba(255,255,255,0.95);
+            color: var(--rancho-charcoal);
+            outline: none;
+        }
+
+        input:focus, select:focus{
+            border-color: var(--rancho-blue2);
+            box-shadow: 0 10px 20px rgba(9,102,174,0.15);
+        }
+
+        button{
+            cursor: pointer;
+            font-weight: 900;
+        }
+        button:disabled{
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .btn{
+            border-color: rgba(17,98,170,0.16);
+            background: rgba(17,98,170,0.10);
+            color: var(--rancho-blue);
+        }
+        .btn:hover{
+            background: rgba(17,98,170,0.16);
+        }
+
+        .btn-primary{
+            border-color: var(--rancho-blue);
+            background: var(--rancho-blue);
+            color: #fff;
+        }
+        .btn-primary:hover{
+            border-color: var(--rancho-blue2);
+            background: var(--rancho-blue2);
+        }
+
+        .btn-danger{
+            border-color: rgba(176,0,32,0.22);
+            background: rgba(176,0,32,0.10);
+            color: var(--danger);
+        }
+        .btn-danger:hover{
+            background: rgba(176,0,32,0.16);
+        }
+
+        .box{
+            border: 1px solid rgba(39,40,39,0.10);
+            border-radius: var(--r12);
+            padding: 12px;
+            background: rgba(255,255,255,0.92);
+        }
+
+        .sep{ height:1px; background: rgba(39,40,39,0.08); margin: 12px 0; }
+
+        .list{
+            max-height: 220px;
+            overflow:auto;
+            border: 1px solid rgba(39,40,39,0.10);
+            border-radius: var(--r12);
+            padding: 8px;
+            background: rgba(255,255,255,0.92);
+        }
+        .list label{
+            display:flex;
+            gap: 10px;
+            align-items:center;
+            padding: 6px 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(39,40,39,0.82);
+        }
+
+        .err{
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--danger);
+        }
+
+        .report-hint{
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .patient-section{
+            border: 1px solid rgba(39,40,39,0.10);
+            border-radius: var(--r16);
+            padding: 12px;
+            margin-top: 12px;
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+        }
+
+        .patient-head{
+            display:flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .patient-head h2{
+            margin:0;
+            font-size: 14px;
+            font-weight: 950;
+            color: var(--rancho-charcoal);
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        canvas{
+            width: 100%;
+            height: 220px;
+            border: 1px solid rgba(39,40,39,0.10);
+            border-radius: var(--r16);
+            background: rgba(255,255,255,0.98);
+        }
+
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td{
+            text-align:left;
+            padding: 8px 8px;
+            border-bottom: 1px solid rgba(39,40,39,0.07);
+            vertical-align: top;
+        }
+        th{
+            color: rgba(39,40,39,0.60);
+            font-weight: 900;
+        }
+
+        .ecg-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .badge{
+            display:inline-flex;
+            align-items:center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(39,40,39,0.10);
+            background: rgba(255,255,255,0.70);
+            font-size: 12px;
+            font-weight: 900;
+            color: rgba(39,40,39,0.80);
+            white-space: nowrap;
+        }
+
+        .badge small{
+            font-weight: 900;
+            color: rgba(39,40,39,0.60);
+        }
+
+        @media print{
+            body{ background: #fff !important; }
+            header{ position: static; background:#fff; border-bottom: 1px solid #ddd; }
+            .wrap{ grid-template-columns: 1fr; }
+            aside{ display:none; }
+            .card, .patient-section{ box-shadow: none !important; background:#fff !important; }
+            canvas{ border-color:#ddd; }
+            .pill, .badge{ border-color:#ddd; background:#fff; }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="header-inner">
+        <div class="brand">
+            <img src="rancho-logo.png" alt="Rancho logo" onerror="this.style.display='none'">
+            <div>
+                <h1>Rancho • RPM Report Generator</h1>
+                <div class="sub">Printable clinical-style reports from telemetry</div>
+            </div>
+        </div>
+        <div class="statusline">
+            <span class="pill ok" id="status">Not loaded.</span>
+            <span class="pill" id="rangeHint"></span>
+        </div>
+    </div>
+</header>
+
+<div class="wrap">
+    <aside class="card panel">
+        <div class="section-title">Report inputs</div>
+
+        <div class="row" style="margin-bottom:10px;">
+            <button id="loadBtn" class="btn">Load latest telemetry</button>
+            <button id="printBtn" class="btn">Print</button>
+        </div>
+
+        <div class="box">
+            <div class="row" style="justify-content: space-between;">
+                <div class="muted">Patients</div>
+                <div class="row">
+                    <button id="allBtn" class="btn" style="padding:8px 10px;">All</button>
+                    <button id="noneBtn" class="btn" style="padding:8px 10px;">None</button>
+                </div>
+            </div>
+
+            <div style="margin-top:8px;">
+                <input id="patientFilter" type="text" placeholder="Filter (e.g., 01, Bed 03)" style="width:100%;">
+            </div>
+
+            <div class="list" id="patientsList" style="margin-top:8px;"></div>
+            <div class="muted" style="margin-top:8px;" id="patientsHint"></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="box">
+            <div class="muted">Time window</div>
+
+            <div class="row" style="margin-top:10px;">
+                <select id="preset" style="flex:1; min-width: 200px;">
+                    <option value="5m">Last 5 minutes</option>
+                    <option value="10m" selected>Last 10 minutes</option>
+                    <option value="30m">Last 30 minutes</option>
+                    <option value="1h">Last 1 hour</option>
+                    <option value="6h">Last 6 hours</option>
+                    <option value="24h">Last 24 hours</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="14d">Last 14 days</option>
+                    <option value="30d">Last 30 days</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <button id="applyPresetBtn" class="btn">Apply</button>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <div style="flex:1; min-width: 160px;">
+                    <div class="muted" style="margin-bottom:6px;">Start</div>
+                    <input id="startInput" type="datetime-local" style="width:100%;">
+                </div>
+                <div style="flex:1; min-width: 160px;">
+                    <div class="muted" style="margin-bottom:6px;">End</div>
+                    <input id="endInput" type="datetime-local" style="width:100%;">
+                </div>
+            </div>
+
+            <div class="muted" style="margin-top:8px;">
+                You can pick dates across days/weeks. If the backend only retains recent samples, older windows may have no data.
+            </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="box">
+            <div class="muted">Vitals to include</div>
+            <div class="list" style="max-height: 190px; margin-top:8px;">
+                <label><input type="checkbox" class="vital" value="hr" checked> Heart rate (bpm)</label>
+                <label><input type="checkbox" class="vital" value="rr" checked> Resp. rate (breaths/min)</label>
+                <label><input type="checkbox" class="vital" value="sys" checked> BP systolic (mmHg)</label>
+                <label><input type="checkbox" class="vital" value="dia" checked> BP diastolic (mmHg)</label>
+                <label><input type="checkbox" class="vital" value="temp" checked> Temperature (°C)</label>
+                <label><input type="checkbox" class="vital" value="ecg"> ECG (show all segments in window)</label>
+            </div>
+            <div class="muted" style="margin-top:8px;">
+                Alert episodes are derived on the client using default adult threshold bands.
+            </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+            <button id="generateBtn" class="btn-primary" disabled>Generate report</button>
+            <button id="csvBtn" class="btn" disabled>Download CSV</button>
+        </div>
+
+        <div id="error" class="err"></div>
+    </aside>
+
+    <main class="card report">
+        <div class="section-title">Report output</div>
+        <div class="report-hint" id="summaryHint">Load telemetry, choose inputs, then generate.</div>
+        <div id="reportOut"></div>
+    </main>
+</div>
+
+<script>
+    const TELEMETRY_URL = new URL("telemetry", window.location.href).toString();
+
+    const COLORS = {
+        blue: "#1162aa",
+        blue2: "#0966ae",
+        sky: "#55bff1",
+        navy: "#0b5c9a",
+        charcoal: "#272827",
+        grey: "#c8ced6",
+        red: "#b00020",
+        amber: "#c98b00"
+    };
+
+    const THRESHOLDS = {
+        hr:   { lowAmber: 50,   lowRed: 40,   highAmber: 110, highRed: 130, unit: "bpm", name: "Heart rate" },
+        rr:   { lowAmber: 10,   lowRed: 8,    highAmber: 24,  highRed: 30,  unit: "breaths/min", name: "Resp. rate" },
+        temp: { lowAmber: 36.0, lowRed: 35.0, highAmber: 38.0, highRed: 39.0, unit: "°C", name: "Temperature" },
+        sys:  { lowAmber: 80,   lowRed: 70,   highAmber: 160, highRed: 180, unit: "mmHg", name: "BP systolic" },
+        dia:  { lowAmber: 50,   lowRed: 40,   highAmber: 100, highRed: 110, unit: "mmHg", name: "BP diastolic" }
+    };
+
+    const statusEl = document.getElementById("status");
+    const rangeHintEl = document.getElementById("rangeHint");
+    const errEl = document.getElementById("error");
+    const patientsListEl = document.getElementById("patientsList");
+    const patientsHintEl = document.getElementById("patientsHint");
+    const patientFilterEl = document.getElementById("patientFilter");
+    const generateBtn = document.getElementById("generateBtn");
+    const csvBtn = document.getElementById("csvBtn");
+    const reportOut = document.getElementById("reportOut");
+    const summaryHint = document.getElementById("summaryHint");
+    const presetSel = document.getElementById("preset");
+    const applyPresetBtn = document.getElementById("applyPresetBtn");
+    const startInput = document.getElementById("startInput");
+    const endInput = document.getElementById("endInput");
+
+    let lastPatients = null; // map bedId -> telemetry object
+    let lastFetchAtMs = 0;
+
+    function asPatientsMap(payload) {
+        if (!payload) return {};
+        return payload.patients || payload;
+    }
+
+    function bedIds(patients) {
+        return Object.keys(patients || {}).sort((a,b) => a.localeCompare(b));
+    }
+
+    function toIsoLocal(ms) {
+        const d = new Date(ms);
+        const pad = n => String(n).padStart(2, "0");
+        const y = d.getFullYear();
+        const m = pad(d.getMonth() + 1);
+        const da = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const mm = pad(d.getMinutes());
+        return `${y}-${m}-${da}T${hh}:${mm}`;
+    }
+
+    function fmtTime(ms) {
+        if (!Number.isFinite(ms)) return "-";
+        return new Date(ms).toLocaleString();
+    }
+
+    function safeNum(x) {
+        return (typeof x === "number" && Number.isFinite(x)) ? x : null;
+    }
+
+    function seriesRange(p) {
+        const ts = Array.isArray(p?.ts) ? p.ts : [];
+        if (!ts.length) return null;
+        let min = Infinity, max = -Infinity;
+        for (const t of ts) {
+            if (typeof t !== "number") continue;
+            if (t < min) min = t;
+            if (t > max) max = t;
+        }
+        if (!Number.isFinite(min) || !Number.isFinite(max)) return null;
+        return { min, max };
+    }
+
+    function globalRange(patients, selectedBeds) {
+        let min = Infinity, max = -Infinity, any = false;
+        for (const bed of selectedBeds) {
+            const r = seriesRange(patients[bed]);
+            if (!r) continue;
+            any = true;
+            if (r.min < min) min = r.min;
+            if (r.max > max) max = r.max;
+        }
+        if (!any) return null;
+        return { min, max };
+    }
+
+    function selectedBeds() {
+        const boxes = patientsListEl.querySelectorAll('input[type="checkbox"][data-bed]');
+        const out = [];
+        boxes.forEach(b => { if (b.checked) out.push(b.getAttribute("data-bed")); });
+        return out;
+    }
+
+    function selectedVitals() {
+        const boxes = document.querySelectorAll('input.vital[type="checkbox"]');
+        const out = [];
+        boxes.forEach(b => { if (b.checked) out.push(b.value); });
+        return out;
+    }
+
+    function setAllPatients(checked) {
+        const boxes = patientsListEl.querySelectorAll('input[type="checkbox"][data-bed]');
+        boxes.forEach(b => b.checked = checked);
+        updateGenerateEnabled();
+    }
+
+    function updateGenerateEnabled() {
+        const ok = !!lastPatients && selectedBeds().length > 0 && selectedVitals().length > 0;
+        generateBtn.disabled = !ok;
+        csvBtn.disabled = !ok;
+    }
+
+    function buildPatientsList(patients) {
+        patientsListEl.innerHTML = "";
+        const beds = bedIds(patients);
+        for (const bed of beds) {
+            const id = `bed_${bed.replace(/\s+/g, "_")}`;
+            const label = document.createElement("label");
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.id = id;
+            cb.checked = true;
+            cb.setAttribute("data-bed", bed);
+            cb.addEventListener("change", updateGenerateEnabled);
+
+            const span = document.createElement("span");
+            span.textContent = bed;
+
+            label.appendChild(cb);
+            label.appendChild(span);
+            patientsListEl.appendChild(label);
+        }
+        patientsHintEl.textContent = beds.length
+            ? `${beds.length} patient(s) available.`
+            : `No patients returned from ${TELEMETRY_URL}.`;
+        updateGenerateEnabled();
+    }
+
+    function applyFilter() {
+        const q = (patientFilterEl.value || "").trim().toLowerCase();
+        const labels = patientsListEl.querySelectorAll("label");
+        labels.forEach(l => {
+            const bed = l.textContent.toLowerCase();
+            l.style.display = (!q || bed.includes(q)) ? "" : "none";
+        });
+    }
+
+    function parseMsFromInput(el) {
+        const v = el.value;
+        if (!v) return null;
+        const t = new Date(v).getTime();
+        return Number.isFinite(t) ? t : null;
+    }
+
+    function presetToMs(presetValue) {
+        if (!presetValue || presetValue === "custom") return null;
+        const m = String(presetValue).trim().toLowerCase();
+
+        const num = parseFloat(m);
+        if (!Number.isFinite(num)) return null;
+
+        if (m.endsWith("m")) return num * 60 * 1000;
+        if (m.endsWith("h")) return num * 60 * 60 * 1000;
+        if (m.endsWith("d")) return num * 24 * 60 * 60 * 1000;
+        if (m.endsWith("w")) return num * 7 * 24 * 60 * 60 * 1000;
+        return null;
+    }
+
+    function applyPreset(presetValue) {
+        if (!lastPatients) return;
+        const beds = selectedBeds();
+        if (!beds.length) return;
+
+        const r = globalRange(lastPatients, beds);
+        if (!r) return;
+
+        if (presetValue === "custom") return;
+
+        const durMs = presetToMs(presetValue);
+        if (!durMs) return;
+
+        const end = r.max;
+        const start = Math.max(r.min, end - durMs);
+        startInput.value = toIsoLocal(start);
+        endInput.value = toIsoLocal(end);
+    }
+
+    function extractWindow(p, startMs, endMs, vitalKey) {
+        const ts = Array.isArray(p?.ts) ? p.ts : [];
+        const vals = Array.isArray(p?.[vitalKey]) ? p[vitalKey] : [];
+        const n = Math.min(ts.length, vals.length);
+        const out = [];
+        for (let i = 0; i < n; i++) {
+            const t = ts[i];
+            if (typeof t !== "number") continue;
+            if (t < startMs || t > endMs) continue;
+            const v = safeNum(vals[i]);
+            out.push({ t, v });
+        }
+        return out;
+    }
+
+    function classify(v, band) {
+        if (v === null || band == null) return 0;
+        if (v <= band.lowRed || v >= band.highRed) return 2;   // RED
+        if (v <= band.lowAmber || v >= band.highAmber) return 1; // AMBER
+        return 0;
+    }
+
+    function computeEpisodes(points, band) {
+        const eps = [];
+        let active = null; // {level,startMs}
+
+        for (let i = 0; i < points.length; i++) {
+            const lvl = classify(points[i].v, band);
+            const t = points[i].t;
+
+            if (lvl > 0) {
+                if (!active) {
+                    active = { level: lvl, startMs: t };
+                } else if (active.level !== lvl) {
+                    eps.push({ level: active.level, startMs: active.startMs, endMs: t });
+                    active = { level: lvl, startMs: t };
+                }
+            } else {
+                if (active) {
+                    eps.push({ level: active.level, startMs: active.startMs, endMs: t });
+                    active = null;
+                }
+            }
+        }
+
+        if (active && points.length) {
+            eps.push({ level: active.level, startMs: active.startMs, endMs: points[points.length - 1].t });
+        }
+
+        const merged = [];
+        for (const e of eps) {
+            const last = merged[merged.length - 1];
+            if (last && last.level === e.level && last.endMs === e.startMs) {
+                last.endMs = e.endMs;
+            } else {
+                merged.push({ ...e });
+            }
+        }
+        return merged;
+    }
+
+    function stats(points) {
+        let n = 0, sum = 0, min = Infinity, max = -Infinity;
+        for (const p of points) {
+            if (p.v === null) continue;
+            n++;
+            sum += p.v;
+            if (p.v < min) min = p.v;
+            if (p.v > max) max = p.v;
+        }
+        if (n === 0) return null;
+        return { n, mean: sum / n, min, max };
+    }
+
+    function nice(n, digits=1) {
+        if (!Number.isFinite(n)) return "--";
+        return n.toFixed(digits);
+    }
+
+    function drawChart(canvas, points, band, title, unit) {
+        const ctx = canvas.getContext("2d");
+        const W = canvas.width, H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, W, H);
+
+        const padL = 54, padR = 14, padT = 30, padB = 34;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+
+        ctx.fillStyle = COLORS.charcoal;
+        ctx.font = "bold 12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        ctx.fillText(`${title} (${unit})`, padL, 18);
+
+        if (!points.length) {
+            ctx.fillStyle = "rgba(39,40,39,0.60)";
+            ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+            ctx.fillText("No data in selected window.", padL, padT + 20);
+            return;
+        }
+
+        let minT = Infinity, maxT = -Infinity;
+        let minV = Infinity, maxV = -Infinity;
+
+        for (const p of points) {
+            if (typeof p.t === "number") {
+                if (p.t < minT) minT = p.t;
+                if (p.t > maxT) maxT = p.t;
+            }
+            if (p.v !== null) {
+                if (p.v < minV) minV = p.v;
+                if (p.v > maxV) maxV = p.v;
+            }
+        }
+
+        if (band) {
+            minV = Math.min(minV, band.lowRed, band.lowAmber);
+            maxV = Math.max(maxV, band.highRed, band.highAmber);
+        }
+        if (!Number.isFinite(minV) || !Number.isFinite(maxV) || minV === maxV) {
+            minV -= 1; maxV += 1;
+        }
+        const dv = (maxV - minV);
+        minV -= dv * 0.05;
+        maxV += dv * 0.05;
+
+        function xOf(t) {
+            if (maxT === minT) return padL;
+            return padL + ((t - minT) / (maxT - minT)) * plotW;
+        }
+        function yOf(v) {
+            return padT + (1 - ((v - minV) / (maxV - minV))) * plotH;
+        }
+
+        // axes
+        ctx.strokeStyle = "rgba(200,206,214,0.95)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padL, padT);
+        ctx.lineTo(padL, padT + plotH);
+        ctx.lineTo(padL + plotW, padT + plotH);
+        ctx.stroke();
+
+        // labels
+        ctx.fillStyle = "rgba(39,40,39,0.60)";
+        ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        ctx.fillText(fmtTime(minT), padL, H - 12);
+        const endLabel = fmtTime(maxT);
+        const endW = ctx.measureText(endLabel).width;
+        ctx.fillText(endLabel, padL + plotW - endW, H - 12);
+
+        ctx.fillText(nice(maxV, 1), 10, padT + 10);
+        ctx.fillText(nice(minV, 1), 10, padT + plotH);
+
+        function hLine(val, label, color) {
+            const y = yOf(val);
+            ctx.strokeStyle = color;
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(padL + plotW, y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = "rgba(39,40,39,0.60)";
+            ctx.fillText(label, padL + 8, y - 3);
+        }
+
+        if (band) {
+            hLine(band.lowAmber, "low amber", "rgba(201,139,0,0.75)");
+            hLine(band.lowRed, "low red", "rgba(176,0,32,0.75)");
+            hLine(band.highAmber, "high amber", "rgba(201,139,0,0.75)");
+            hLine(band.highRed, "high red", "rgba(176,0,32,0.75)");
+        }
+
+        // series
+        ctx.strokeStyle = COLORS.blue2;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        let started = false;
+        for (const p of points) {
+            if (p.v === null) continue;
+            const x = xOf(p.t);
+            const y = yOf(p.v);
+            if (!started) { ctx.moveTo(x, y); started = true; }
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // points
+        ctx.fillStyle = COLORS.blue2;
+        for (const p of points) {
+            if (p.v === null) continue;
+            const x = xOf(p.t);
+            const y = yOf(p.v);
+            ctx.fillRect(x - 1, y - 1, 2, 2);
+        }
+    }
+
+    function renderEpisodesTable(episodes) {
+        if (!episodes.length) {
+            const div = document.createElement("div");
+            div.className = "muted";
+            div.textContent = "No alert episodes detected in this window.";
+            return div;
+        }
+
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        thead.innerHTML = `<tr><th>Level</th><th>Start</th><th>End</th><th>Duration</th></tr>`;
+        table.appendChild(thead);
+
+        const tb = document.createElement("tbody");
+        for (const e of episodes) {
+            const lvl = e.level === 2 ? "RED" : "AMBER";
+            const durMs = Math.max(0, e.endMs - e.startMs);
+            const durS = Math.round(durMs / 1000);
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+        <td><span class="pill ${e.level===2?'red':'amber'}" style="padding:4px 10px">${lvl}</span></td>
+        <td>${fmtTime(e.startMs)}</td>
+        <td>${fmtTime(e.endMs)}</td>
+        <td>${durS}s</td>
+      `;
+            tb.appendChild(tr);
+        }
+        table.appendChild(tb);
+        return table;
+    }
+
+    function getEcgSegments(p) {
+        // Preferred: p.ecgSegments = [{tsStartMs, fsHz, samples:[...]}]
+        if (Array.isArray(p?.ecgSegments)) {
+            return p.ecgSegments
+                .map(s => ({
+                    tsStartMs: typeof s?.tsStartMs === "number" ? s.tsStartMs : (typeof s?.ts_start_ms === "number" ? s.ts_start_ms : null),
+                    fsHz: typeof s?.fsHz === "number" ? s.fsHz : (typeof s?.fs_hz === "number" ? s.fs_hz : null),
+                    samples: Array.isArray(s?.samples) ? s.samples : (Array.isArray(s?.ecg) ? s.ecg : [])
+                }))
+                .filter(s => Array.isArray(s.samples) && s.samples.length);
+        }
+
+        // Backward compatible: p.ecg + p.ecgTsStart + p.ecgFs (single segment)
+        const ecgArr = Array.isArray(p?.ecg) ? p.ecg : [];
+        if (ecgArr.length) {
+            return [{
+                tsStartMs: (typeof p?.ecgTsStart === "number") ? p.ecgTsStart : null,
+                fsHz: (typeof p?.ecgFs === "number") ? p.ecgFs : null,
+                samples: ecgArr
+            }];
+        }
+
+        return [];
+    }
+
+    function segmentEndMs(seg) {
+        if (!seg || !Array.isArray(seg.samples) || !seg.samples.length) return null;
+        if (!Number.isFinite(seg.tsStartMs) || !Number.isFinite(seg.fsHz) || seg.fsHz <= 0) return seg.tsStartMs || null;
+        const durMs = ((seg.samples.length - 1) / seg.fsHz) * 1000;
+        return seg.tsStartMs + Math.max(0, durMs);
+    }
+
+    function intersectsWindow(seg, startMs, endMs) {
+        const s = seg.tsStartMs;
+        const e = segmentEndMs(seg);
+        if (!Number.isFinite(s)) return false;
+        if (!Number.isFinite(e)) return (s >= startMs && s <= endMs);
+        return !(e < startMs || s > endMs);
+    }
+
+    function nearestVitalAt(p, targetMs, vitalKey) {
+        const ts = Array.isArray(p?.ts) ? p.ts : [];
+        const arr = Array.isArray(p?.[vitalKey]) ? p[vitalKey] : [];
+        const n = Math.min(ts.length, arr.length);
+        if (!n) return null;
+
+        let bestI = 0;
+        let bestD = Infinity;
+        for (let i = 0; i < n; i++) {
+            const t = ts[i];
+            if (typeof t !== "number") continue;
+            const d = Math.abs(t - targetMs);
+            if (d < bestD) { bestD = d; bestI = i; }
+        }
+
+        const tBest = ts[bestI];
+        const vBest = safeNum(arr[bestI]);
+        return { t: tBest, v: vBest, dtMs: bestD };
+    }
+
+    function drawEcg(canvas, samples) {
+        const ctx = canvas.getContext("2d");
+        const W = canvas.width, H = canvas.height;
+
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0,0,W,H);
+
+        if (!samples || !samples.length) {
+            ctx.fillStyle = "rgba(39,40,39,0.60)";
+            ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+            ctx.fillText("No ECG samples available.", 16, 28);
+            return;
+        }
+
+        let min = Infinity, max = -Infinity;
+        for (const v of samples) {
+            if (typeof v !== "number") continue;
+            if (v < min) min = v;
+            if (v > max) max = v;
+        }
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) { min -= 1; max += 1; }
+
+        const pad = 14;
+        ctx.strokeStyle = COLORS.blue2;
+        ctx.lineWidth = 1.4;
+
+        ctx.beginPath();
+        for (let i = 0; i < samples.length; i++) {
+            const x = pad + (i / (samples.length - 1)) * (W - pad*2);
+            const y = (H - pad) - ((samples[i] - min) / (max - min)) * (H - pad*2);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+
+    function renderEcgSegmentsBox(p, startMs, endMs, vitalsSelected) {
+        const segsAll = getEcgSegments(p);
+        const segs = segsAll.filter(s => intersectsWindow(s, startMs, endMs));
+
+        const outer = document.createElement("div");
+        outer.className = "box";
+        outer.style.marginTop = "12px";
+
+        const top = document.createElement("div");
+        top.className = "row";
+        top.style.justifyContent = "space-between";
+
+        const left = document.createElement("div");
+        left.innerHTML = `
+      <div style="font-weight:950;">ECG segments in selected window</div>
+      <div class="muted" style="margin-top:2px;">
+        ${segs.length ? `${segs.length} segment(s) found.` : `No ECG segments found in this window.`}
+      </div>
+    `;
+        top.appendChild(left);
+
+        const right = document.createElement("div");
+        right.className = "row";
+        right.innerHTML = `
+      <span class="badge"><small>Total stored:</small> ${segsAll.length}</span>
+    `;
+        top.appendChild(right);
+
+        outer.appendChild(top);
+
+        if (!segs.length) return outer;
+
+        const grid = document.createElement("div");
+        grid.className = "ecg-grid";
+
+        const nonEcgVitals = vitalsSelected.filter(v => v !== "ecg");
+
+        const MAX_RENDER = 24;
+        const segsToRender = segs.slice(0, MAX_RENDER);
+
+        for (const seg of segsToRender) {
+            const card = document.createElement("div");
+            card.className = "box";
+
+            const when = Number.isFinite(seg.tsStartMs) ? fmtTime(seg.tsStartMs) : "Unknown time";
+            const fs = Number.isFinite(seg.fsHz) ? seg.fsHz : "--";
+            const n = Array.isArray(seg.samples) ? seg.samples.length : 0;
+
+            const header = document.createElement("div");
+            header.className = "row";
+            header.style.justifyContent = "space-between";
+            header.innerHTML = `
+        <div>
+          <div style="font-weight:950;">Captured during alert window</div>
+          <div class="muted" style="margin-top:2px;">Start: ${when} • fs=${fs}Hz • n=${n}</div>
+        </div>
+      `;
+
+            //which vitals out of range near capture time
+            const ctxPills = document.createElement("div");
+            ctxPills.className = "row";
+
+            let anyAmber = false, anyRed = false;
+            const rows = [];
+
+            for (const vk of nonEcgVitals) {
+                const band = THRESHOLDS[vk];
+                if (!band) continue;
+                const near = Number.isFinite(seg.tsStartMs) ? nearestVitalAt(p, seg.tsStartMs, vk) : null;
+                const val = near ? near.v : null;
+                const lvl = classify(val, band);
+
+                if (lvl === 2) anyRed = true;
+                if (lvl === 1) anyAmber = true;
+
+                rows.push({
+                    name: band.name,
+                    key: vk,
+                    v: val,
+                    unit: band.unit,
+                    lvl,
+                    at: near ? near.t : null,
+                    dtMs: near ? near.dtMs : null
+                });
+            }
+
+            if (anyRed) ctxPills.innerHTML += `<span class="pill red">RED trigger present</span>`;
+            if (!anyRed && anyAmber) ctxPills.innerHTML += `<span class="pill amber">AMBER trigger present</span>`;
+            if (!anyRed && !anyAmber && nonEcgVitals.length) ctxPills.innerHTML += `<span class="pill ok">No triggers from selected vitals</span>`;
+
+            header.appendChild(ctxPills);
+            card.appendChild(header);
+
+            const tbl = document.createElement("table");
+            tbl.style.marginTop = "10px";
+            tbl.innerHTML = `<thead><tr>
+        <th>Vital</th><th>Value</th><th>Level</th><th>Nearest sample</th>
+      </tr></thead>`;
+            const tb = document.createElement("tbody");
+
+            for (const r of rows) {
+                const lvlText = r.lvl === 2 ? "RED" : (r.lvl === 1 ? "AMBER" : "OK");
+                const cls = r.lvl === 2 ? "red" : (r.lvl === 1 ? "amber" : "ok");
+                const vText = (r.v === null) ? "--" : `${nice(r.v, 2)} ${r.unit}`;
+                const tText = (r.at == null) ? "--" : `${fmtTime(r.at)} (${Math.round((r.dtMs||0)/1000)}s away)`;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td style="font-weight:900;">${r.name}</td>
+          <td>${vText}</td>
+          <td><span class="pill ${cls}" style="padding:4px 10px">${lvlText}</span></td>
+          <td>${tText}</td>
+        `;
+                tb.appendChild(tr);
+            }
+            tbl.appendChild(tb);
+            card.appendChild(tbl);
+
+            const canv = document.createElement("canvas");
+            canv.width = 900;
+            canv.height = 260;
+            canv.style.marginTop = "10px";
+            card.appendChild(canv);
+            drawEcg(canv, seg.samples);
+
+            grid.appendChild(card);
+        }
+
+        if (segs.length > MAX_RENDER) {
+            const note = document.createElement("div");
+            note.className = "muted";
+            note.style.marginTop = "10px";
+            note.textContent = `Showing first ${MAX_RENDER} ECG segments (there are ${segs.length} in this window).`;
+            outer.appendChild(note);
+        }
+
+        outer.appendChild(grid);
+        return outer;
+    }
+
+    function renderPatientSection(bed, p, startMs, endMs, vitals) {
+        const section = document.createElement("div");
+        section.className = "patient-section";
+
+        const head = document.createElement("div");
+        head.className = "patient-head";
+
+        const title = document.createElement("h2");
+        title.textContent = bed;
+
+        const pills = document.createElement("div");
+        pills.className = "row";
+
+        const r = seriesRange(p);
+        const avail = r ? `${fmtTime(r.min)} → ${fmtTime(r.max)}` : "No timestamps";
+        const pill1 = document.createElement("span");
+        pill1.className = "pill";
+        pill1.textContent = `Available: ${avail}`;
+
+        const pill2 = document.createElement("span");
+        pill2.className = "pill";
+        pill2.textContent = `Window: ${fmtTime(startMs)} → ${fmtTime(endMs)}`;
+
+        pills.appendChild(pill1);
+        pills.appendChild(pill2);
+
+        head.appendChild(title);
+        head.appendChild(pills);
+        section.appendChild(head);
+
+        // Summary stats table
+        const sumTable = document.createElement("table");
+        sumTable.style.marginTop = "12px";
+        sumTable.innerHTML = `<thead><tr>
+      <th>Vital</th><th>n</th><th>Mean</th><th>Min</th><th>Max</th>
+    </tr></thead>`;
+        const tb = document.createElement("tbody");
+
+        const grid = document.createElement("div");
+        grid.className = "grid";
+
+        // overall worst-per-timestamp points
+        const overallPoints = [];
+        const ts = Array.isArray(p?.ts) ? p.ts : [];
+
+        for (let i = 0; i < ts.length; i++) {
+            const t = ts[i];
+            if (typeof t !== "number") continue;
+            if (t < startMs || t > endMs) continue;
+
+            let worst = 0; // 0 ok, 1 amber, 2 red
+            for (const vk of vitals) {
+                if (vk === "ecg") continue;
+                const band = THRESHOLDS[vk];
+                const arr = Array.isArray(p?.[vk]) ? p[vk] : [];
+                const v = safeNum(arr[i]);
+                const lvl = classify(v, band);
+                if (lvl > worst) worst = lvl;
+            }
+            overallPoints.push({ t, v: worst });
+        }
+
+        for (const vk of vitals) {
+            if (vk === "ecg") continue;
+
+            const band = THRESHOLDS[vk];
+            const pts = extractWindow(p, startMs, endMs, vk);
+
+            const st = stats(pts);
+            const tr = document.createElement("tr");
+            if (!st) {
+                tr.innerHTML = `<td>${band?.name || vk}</td><td>0</td><td>--</td><td>--</td><td>--</td>`;
+            } else {
+                tr.innerHTML = `<td>${band.name}</td><td>${st.n}</td><td>${nice(st.mean, 1)}</td><td>${nice(st.min, 1)}</td><td>${nice(st.max, 1)}</td>`;
+            }
+            tb.appendChild(tr);
+
+            const card = document.createElement("div");
+            card.className = "box";
+
+            const canv = document.createElement("canvas");
+            canv.width = 900;
+            canv.height = 280;
+            card.appendChild(canv);
+
+            drawChart(canv, pts, band, band.name, band.unit);
+
+            const eps = computeEpisodes(pts, band);
+            const below = document.createElement("div");
+            below.style.marginTop = "10px";
+            below.innerHTML = `<div class="muted" style="margin-bottom:6px;">Derived alert episodes (based on thresholds)</div>`;
+            below.appendChild(renderEpisodesTable(eps));
+            card.appendChild(below);
+
+            grid.appendChild(card);
+        }
+
+        sumTable.appendChild(tb);
+        section.appendChild(sumTable);
+
+        // overall episodes
+        if (vitals.some(v => v !== "ecg")) {
+            const overallEpisodes = [];
+            let active = null;
+
+            for (const p2 of overallPoints) {
+                const lvl = p2.v;
+                const t = p2.t;
+                if (lvl > 0) {
+                    if (!active) active = { level: lvl, startMs: t };
+                    else if (active.level !== lvl) {
+                        overallEpisodes.push({ level: active.level, startMs: active.startMs, endMs: t });
+                        active = { level: lvl, startMs: t };
+                    }
+                } else {
+                    if (active) {
+                        overallEpisodes.push({ level: active.level, startMs: active.startMs, endMs: t });
+                        active = null;
+                    }
+                }
+            }
+
+            if (active && overallPoints.length) {
+                overallEpisodes.push({ level: active.level, startMs: active.startMs, endMs: overallPoints[overallPoints.length - 1].t });
+            }
+
+            const overallBox = document.createElement("div");
+            overallBox.className = "box";
+            overallBox.style.marginTop = "12px";
+            overallBox.innerHTML = `<div class="muted" style="margin-bottom:6px;">Overall alert episodes (worst across selected vitals)</div>`;
+            overallBox.appendChild(renderEpisodesTable(overallEpisodes));
+            section.appendChild(overallBox);
+        }
+
+        if (vitals.includes("ecg")) {
+            section.appendChild(renderEcgSegmentsBox(p, startMs, endMs, vitals));
+        }
+
+        section.appendChild(grid);
+        return section;
+    }
+
+    function buildCsv(patients, beds, startMs, endMs) {
+        const cols = ["bed", "timestamp_ms", "timestamp_iso", "hr", "rr", "sys", "dia", "temp"];
+        let out = cols.join(",") + "\n";
+
+        for (const bed of beds) {
+            const p = patients[bed];
+            const ts = Array.isArray(p?.ts) ? p.ts : [];
+            const hr = Array.isArray(p?.hr) ? p.hr : [];
+            const rr = Array.isArray(p?.rr) ? p.rr : [];
+            const sys = Array.isArray(p?.sys) ? p.sys : [];
+            const dia = Array.isArray(p?.dia) ? p.dia : [];
+            const temp = Array.isArray(p?.temp) ? p.temp : [];
+
+            const n = Math.max(ts.length, hr.length, rr.length, sys.length, dia.length, temp.length);
+            for (let i = 0; i < n; i++) {
+                const t = ts[i];
+                if (typeof t !== "number") continue;
+                if (t < startMs || t > endMs) continue;
+
+                const row = [
+                    bed,
+                    t,
+                    new Date(t).toISOString(),
+                    safeNum(hr[i]),
+                    safeNum(rr[i]),
+                    safeNum(sys[i]),
+                    safeNum(dia[i]),
+                    safeNum(temp[i])
+                ].map(x => (x === null || x === undefined) ? "" : String(x));
+
+                out += row.join(",") + "\n";
+            }
+        }
+        return out;
+    }
+
+    async function loadTelemetry() {
+        errEl.textContent = "";
+        statusEl.textContent = "Loading telemetry…";
+        statusEl.className = "pill ok";
+        rangeHintEl.textContent = "";
+        reportOut.innerHTML = "";
+        summaryHint.textContent = "Loading…";
+
+        const t0 = performance.now();
+        const res = await fetch(TELEMETRY_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`GET ${TELEMETRY_URL} failed: ${res.status} ${res.statusText}`);
+        const data = await res.json();
+        const dt = Math.round(performance.now() - t0);
+
+        lastFetchAtMs = Date.now();
+        lastPatients = asPatientsMap(data);
+
+        const beds = bedIds(lastPatients);
+        statusEl.textContent = `Loaded ${beds.length} patient(s) • ${dt} ms`;
+        statusEl.className = "pill ok";
+
+        buildPatientsList(lastPatients);
+        applyFilter();
+
+        const selBeds = selectedBeds();
+        if (selBeds.length) {
+            const r = globalRange(lastPatients, selBeds);
+            if (r) {
+                rangeHintEl.textContent = `Telemetry range (selected): ${fmtTime(r.min)} → ${fmtTime(r.max)}`;
+                applyPreset(presetSel.value);
+            }
+        }
+
+        summaryHint.textContent = "Choose inputs, then click “Generate report”.";
+        updateGenerateEnabled();
+    }
+
+    function generateReport() {
+        errEl.textContent = "";
+        reportOut.innerHTML = "";
+
+        if (!lastPatients) {
+            errEl.textContent = "No telemetry loaded yet.";
+            return;
+        }
+
+        const beds = selectedBeds();
+        const vitals = selectedVitals();
+
+        if (!beds.length) {
+            errEl.textContent = "Select at least one patient.";
+            return;
+        }
+        if (!vitals.length) {
+            errEl.textContent = "Select at least one vital.";
+            return;
+        }
+
+        let startMs = parseMsFromInput(startInput);
+        let endMs = parseMsFromInput(endInput);
+
+        if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || startMs >= endMs) {
+            const r = globalRange(lastPatients, beds);
+            if (!r) {
+                errEl.textContent = "No timestamps found for selected patients.";
+                return;
+            }
+
+            const durMs = presetToMs(presetSel.value) || (10 * 60 * 1000);
+            endMs = r.max;
+            startMs = Math.max(r.min, endMs - durMs);
+            startInput.value = toIsoLocal(startMs);
+            endInput.value = toIsoLocal(endMs);
+        }
+
+        const top = document.createElement("div");
+        top.className = "box";
+        top.innerHTML = `
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <div style="font-weight:950;">Report</div>
+          <div class="muted" style="margin-top:2px;">Generated: ${new Date().toLocaleString()}</div>
+        </div>
+        <div class="row">
+          <span class="pill ok">Patients: ${beds.length}</span>
+          <span class="pill">Vitals: ${vitals.join(", ")}</span>
+        </div>
+      </div>
+      <div class="muted" style="margin-top:8px;">Window: ${fmtTime(startMs)} → ${fmtTime(endMs)}</div>
+    `;
+        reportOut.appendChild(top);
+
+        for (const bed of beds) {
+            const p = lastPatients[bed];
+            if (!p) continue;
+            reportOut.appendChild(renderPatientSection(bed, p, startMs, endMs, vitals));
+        }
+
+        summaryHint.textContent = "";
+    }
+
+    // UI wiring
+    document.getElementById("loadBtn").addEventListener("click", () =>
+        loadTelemetry().catch(e => errEl.textContent = e.stack || String(e))
+    );
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+    document.getElementById("allBtn").addEventListener("click", () => setAllPatients(true));
+    document.getElementById("noneBtn").addEventListener("click", () => setAllPatients(false));
+    patientFilterEl.addEventListener("input", applyFilter);
+
+    document.querySelectorAll('input.vital[type="checkbox"]').forEach(cb =>
+        cb.addEventListener("change", updateGenerateEnabled)
+    );
+
+    applyPresetBtn.addEventListener("click", () => applyPreset(presetSel.value));
+    presetSel.addEventListener("change", () => { if (presetSel.value !== "custom") applyPreset(presetSel.value); });
+
+    generateBtn.addEventListener("click", generateReport);
+
+    csvBtn.addEventListener("click", () => {
+        if (!lastPatients) return;
+
+        const beds = selectedBeds();
+        const startMs = parseMsFromInput(startInput);
+        const endMs = parseMsFromInput(endInput);
+
+        if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || startMs >= endMs) {
+            errEl.textContent = "Set a valid time window before downloading CSV.";
+            return;
+        }
+
+        const csv = buildCsv(lastPatients, beds, startMs, endMs);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `rpm_report_${new Date().toISOString().replace(/[:.]/g, "-")}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    });
+
+
+    loadTelemetry().catch(e => errEl.textContent = e.stack || String(e));
+</script>
+</body>
+</html>
