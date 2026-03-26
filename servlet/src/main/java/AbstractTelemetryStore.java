@@ -1,7 +1,11 @@
 import java.util.Map;
 
+/**
+ * Abstract base for all telemetry storage backends.
+ * The only implementation used in CortiSense is {@link InMemoryTelemetryStore}.
+ */
 public abstract class AbstractTelemetryStore {
-    public abstract void store(String bedId, PatientTelemetry data);
-    public abstract PatientTelemetry get(String bedId);
-    public abstract Map<String, PatientTelemetry> getAll();
+    public abstract void store(String subjectId, CortisolReading data);
+    public abstract CortisolReading get(String subjectId);
+    public abstract Map<String, CortisolReading> getAll();
 }

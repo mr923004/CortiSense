@@ -3,5 +3,4 @@ plugins {
 }
 
 rootProject.name = "rpm"
-include 'client', 'servlet'
-
+include 'servlet'

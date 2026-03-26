@@ -4,17 +4,14 @@ allprojects {
     }
 }
 
-tasks.register("buildAll") {
-    dependsOn(
-            ":client:build",
-            "servlet:build"
-    )
-}
-
-tasks.register("runAll") {
-    dependsOn(
-            "servlet:appStart",
-            ":client:run"
-
-    )
+// ── Run
+// One command starts both the Jetty server AND the cortisol simulation.
+// The simulation is started automatically by CortisolAppListener (@WebListener)
+// when Jetty deploys the servlet context — no second terminal needed.
+//
+//   ./gradlew :servlet:appRun
+//   then open: http://localhost:8080
+//
+tasks.register("run") {
+    dependsOn ":servlet:appRun"
 }
