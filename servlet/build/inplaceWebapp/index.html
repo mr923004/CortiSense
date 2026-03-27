@@ -516,7 +516,7 @@
 
     /* ── Configuration  */
     const SUBJECT      = "user-1";
-    const POLL_MS      = 5_000;          // fetch every 5 s (matching publisher tick)
+    const POLL_MS      = 5_000;
     const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 
     const THRESHOLDS = {
@@ -545,10 +545,15 @@
     };
 
     /* ── State  */
-    let allTs       = [];   // epoch ms
-    let allCortisol = [];   // nmol/L
+    let allTs       = [];
+    let allCortisol = [];
     let currentPhase = "baseline";
     let prevValue    = null;
+
+    /* ── Interactive View State (NEW) ── */
+    let customView = false; // True if the user has zoomed/panned
+    let viewMinT = 0;       // The left edge of the visible graph
+    let viewMaxT = 0;       // The right edge of the visible graph
 
     /* ── DOM refs  */
     const elCurrentVal = document.getElementById("current-val");
@@ -566,10 +571,12 @@
     const histCanvas  = document.getElementById("history-canvas");
     const sparkCanvas = document.getElementById("spark-canvas");
 
+    histCanvas.style.cursor = 'grab';
+
     /* ── Fetch & merge  */
     async function fetchAndRender() {
         try {
-            const resp = await fetch(`/telemetry?subject=${SUBJECT}`, {cache: "no-store"});
+            const resp = await fetch(`http://localhost:8080/telemetry?subject=${SUBJECT}`, {cache: "no-store"});
             if (!resp.ok) throw new Error(resp.status);
             const data = await resp.json();
 
@@ -587,7 +594,6 @@
     }
 
     function mergeData(data) {
-        // data shape: { ts: [...], cortisol: [...], phase: "..." }
         const incoming_ts  = Array.isArray(data.ts)       ? data.ts       : [];
         const incoming_cor = Array.isArray(data.cortisol)  ? data.cortisol : [];
         const n = Math.min(incoming_ts.length, incoming_cor.length);
@@ -596,8 +602,6 @@
             const t = incoming_ts[i];
             const v = incoming_cor[i];
             if (typeof t !== "number" || typeof v !== "number") continue;
-            // Only add points not already in our local series
-            // (simple dedup: just check the last stored timestamp)
             if (allTs.length === 0 || t > allTs[allTs.length - 1]) {
                 allTs.push(t);
                 allCortisol.push(v);
@@ -614,11 +618,15 @@
         const latest = allCortisol[allCortisol.length - 1];
         const now    = allTs[allTs.length - 1];
 
+        // ── Auto-fit graph window if user hasn't zoomed
+        if (!customView) {
+            viewMinT = allTs[0];
+            viewMaxT = allTs[allTs.length - 1];
+        }
+
         // ── Current value
         elCurrentVal.textContent = fmt(latest, 1);
         elLastUpdate.textContent = fmtTime(now);
-
-        // ── Level class
         elHeroValue.className = "hero-value " + levelClass(latest);
 
         // ── Trend
@@ -684,10 +692,17 @@
             return;
         }
 
-        const minT = allTs[0], maxT = allTs[allTs.length - 1];
+        // Draw helper text
+        ctx.fillStyle = COLORS.muted;
+        ctx.font = "10px 'Sora', sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText("🖱️ Scroll to zoom, Drag to pan, Dbl-click to reset", padL + plotW, padT - 6);
+
+        // Apply interactive view bounds
+        const minT = viewMinT, maxT = viewMaxT;
+
         let minV = Math.min(...allCortisol) - 30;
         let maxV = Math.max(...allCortisol) + 30;
-        // Always show threshold lines
         minV = Math.min(minV, THRESHOLDS.low - 20);
         maxV = Math.max(maxV, THRESHOLDS.veryHigh + 20);
 
@@ -705,29 +720,19 @@
         }
 
         // ── Threshold bands (fill)
-        // Very high zone
         const yVH = yOf(THRESHOLDS.veryHigh);
         if (yVH > padT) {
             ctx.fillStyle = "rgba(220,38,38,0.06)";
             ctx.fillRect(padL, padT, plotW, yVH - padT);
         }
-        // Amber zone
         const yHA = yOf(THRESHOLDS.highAmber);
         ctx.fillStyle = "rgba(217,119,6,0.06)";
         ctx.fillRect(padL, yVH, plotW, yHA - yVH);
 
-        // Low zone
         const yLA = yOf(THRESHOLDS.lowAmber);
         ctx.fillStyle = "rgba(37,99,235,0.05)";
         ctx.fillRect(padL, yLA, plotW, yOf(minV) - yLA);
 
-        // ── Stress-rise shading: shade points where phase was stress_rise
-        // (We don't store phase per-point in the history, so we shade the region
-        //  where value is significantly above the circadian baseline — a simple proxy.)
-        // We detect stress region as a run where cortisol > 450 and rising/peaked.
-        // For the demo this is a good-enough visual marker.
-
-        // ── Threshold dashed lines
         function hLine(y, color, label) {
             ctx.save();
             ctx.strokeStyle = color;
@@ -745,6 +750,13 @@
         hLine(yOf(THRESHOLDS.veryHigh),  COLORS.red,   "700");
         hLine(yOf(THRESHOLDS.highAmber), COLORS.amber,  "550");
         hLine(yOf(THRESHOLDS.lowAmber),  COLORS.blue,   "150");
+
+        // ── ADD CLIPPING REGION ──
+        // This prevents the zoomed graph from drawing over the Y-axis numbers
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(padL, padT, plotW, plotH);
+        ctx.clip();
 
         // ── Area fill under curve
         ctx.beginPath();
@@ -772,6 +784,19 @@
         ctx.lineWidth = 2;
         ctx.lineJoin = "round";
         ctx.stroke();
+
+        // ── Latest value dot
+        const lx = xOf(allTs[allTs.length - 1]);
+        const ly = yOf(allCortisol[allCortisol.length - 1]);
+        ctx.beginPath();
+        ctx.arc(lx, ly, 5, 0, Math.PI * 2);
+        ctx.fillStyle = COLORS.teal;
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore(); // ── END CLIPPING REGION ──
 
         // ── Axes
         ctx.strokeStyle = COLORS.border;
@@ -807,17 +832,6 @@
                 ctx.fillText(label, x, padT + plotH + 22);
             }
         }
-
-        // ── Latest value dot
-        const lx = xOf(allTs[allTs.length - 1]);
-        const ly = yOf(allCortisol[allCortisol.length - 1]);
-        ctx.beginPath();
-        ctx.arc(lx, ly, 5, 0, Math.PI * 2);
-        ctx.fillStyle = COLORS.teal;
-        ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
     }
 
     /* ── Sparkline  */
@@ -874,6 +888,81 @@
         const delta2h = cor[cor.length - 1] - cor[0];
         elSparkSub.textContent = `${ts.length} readings · ${delta2h >= 0 ? "+" : ""}${fmt(delta2h, 1)} nmol/L vs 2h ago`;
     }
+
+    /* ── Event Listeners for Zoom & Pan ── */
+
+    // Mouse Wheel to Zoom
+    histCanvas.addEventListener('wheel', (e) => {
+        e.preventDefault(); // Prevent page scrolling
+        if (allTs.length < 2) return;
+        customView = true;
+
+        const rect = histCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const padL = 58;
+        const plotW = rect.width - padL - 20;
+
+        // Find time exactly where mouse is hovering
+        const mouseRatio = Math.max(0, Math.min(1, (mouseX - padL) / plotW));
+        const timeAtMouse = viewMinT + mouseRatio * (viewMaxT - viewMinT);
+
+        // Calculate zoom logic
+        const zoomSpeed = 0.15;
+        const zoomDelta = e.deltaY > 0 ? (1 + zoomSpeed) : (1 - zoomSpeed);
+        const currentRange = viewMaxT - viewMinT;
+        const newRange = currentRange * zoomDelta;
+
+        viewMinT = timeAtMouse - (mouseRatio * newRange);
+        viewMaxT = timeAtMouse + ((1 - mouseRatio) * newRange);
+
+        // Prevent zooming out way past the data
+        const dataMin = allTs[0];
+        const dataMax = allTs[allTs.length - 1];
+        if (viewMinT < dataMin - 3600000) viewMinT = dataMin - 3600000;
+        if (viewMaxT > dataMax + 3600000) viewMaxT = dataMax + 3600000;
+
+        drawHistory();
+    });
+
+    // Click & Drag to Pan
+    let isDragging = false;
+    let lastMouseX = 0;
+
+    histCanvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        histCanvas.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        histCanvas.style.cursor = 'grab';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging || allTs.length < 2) return;
+        customView = true;
+
+        const rect = histCanvas.getBoundingClientRect();
+        const plotW = rect.width - 58 - 20;
+        const deltaX = e.clientX - lastMouseX;
+        lastMouseX = e.clientX;
+
+        // Convert pixel drag to time shift
+        const timePerPixel = (viewMaxT - viewMinT) / plotW;
+        const timeDelta = deltaX * timePerPixel;
+
+        viewMinT -= timeDelta;
+        viewMaxT -= timeDelta;
+
+        drawHistory();
+    });
+
+    // Double-click to reset view
+    histCanvas.addEventListener('dblclick', () => {
+        customView = false;
+        render();
+    });
 
     /* ── Helpers  */
     function fmt(v, digits = 1) {

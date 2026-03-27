@@ -42,8 +42,10 @@ public class CortisolReading {
         prune();
     }
 
-    public synchronized List<Long>   getTs()       { return Collections.unmodifiableList(ts); }
-    public synchronized List<Double> getCortisol() { return Collections.unmodifiableList(cortisol); }
+    // Collections.unmodifiableList(ts)
+    public synchronized List<Long>   getTs()       { return new ArrayList<>(ts); }
+    // Collections.unmodifiableList(cortisol)
+    public synchronized List<Double> getCortisol() { return new ArrayList<>(cortisol); }
     public synchronized String       getPhase()    { return phase; }
     public synchronized int          size()        { return ts.size(); }
 

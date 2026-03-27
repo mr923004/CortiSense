@@ -5,7 +5,7 @@ plugins {
 }
 
 application {
-    mainClass = 'rpm.ui.app.RpmApp'
+    mainClass = 'CortiSenseApp'
 }
 
 /**
@@ -20,7 +20,7 @@ sourceSets {
 
 javafx {
     version = "17.0.10"
-    modules = ['javafx.controls', 'javafx.graphics','javafx.media']
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.media']
 }
 
 dependencies {
