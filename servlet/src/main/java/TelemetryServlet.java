@@ -21,8 +21,7 @@ public class TelemetryServlet extends HttpServlet {
     public void init() {
         store = new InMemoryTelemetryStore();
 
-        // Seed 2 hours of history directly into the store.
-        // No network calls
+        // Seed 2 hours of history
         CortisolSimulator seeder = new CortisolSimulator();
         int count = 120;
         long nowMs   = System.currentTimeMillis();
@@ -36,6 +35,19 @@ public class TelemetryServlet extends HttpServlet {
         publisher = new CortisolPublisher(store);
         publisher.start();
         log.info("CortiSense: publisher started.");
+
+        // --- NEW AUTO-OPEN CODE ---
+        try {
+            // Give the server 1 second to finish booting up before opening the browser
+            Thread.sleep(1000);
+
+            if (java.awt.Desktop.isDesktopSupported() && java.awt.Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI("http://localhost:8080/"));
+                log.info("CortiSense: Opened dashboard in default browser.");
+            }
+        } catch (Exception e) {
+            log.warning("Could not auto-open browser: " + e.getMessage());
+        }
     }
 
     @Override
