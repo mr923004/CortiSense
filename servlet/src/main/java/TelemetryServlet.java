@@ -20,23 +20,10 @@ public class TelemetryServlet extends HttpServlet {
     @Override
     public void init() {
         store = new InMemoryTelemetryStore();
-
-        // Seed 2 hours of history
-        CortisolSimulator seeder = new CortisolSimulator();
-        int count = 120;
-        long nowMs   = System.currentTimeMillis();
-        long startMs = nowMs - (long) count * 60_000L;
-        for (int i = 0; i < count; i++) {
-            long ts = startMs + (long) i * 60_000L;
-            store.store("user-1", seeder.tick(ts, 60.0));
-        }
-        log.info("CortiSense: seeded " + count + " readings. Store size: " + store.get("user-1").size());
-
         publisher = new CortisolPublisher(store);
         publisher.start();
-        log.info("CortiSense: publisher started.");
 
-        // --- NEW AUTO-OPEN CODE ---
+        // Auto open browser
         try {
             // Give the server 1 second to finish booting up before opening the browser
             Thread.sleep(1000);

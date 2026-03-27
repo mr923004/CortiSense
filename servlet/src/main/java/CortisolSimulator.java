@@ -79,6 +79,11 @@ public class CortisolSimulator {
         this.rng = new Random(42);
     }
 
+    public CortisolSimulator(long seed) {
+        this.simElapsedSeconds = 21_600.0;  // 06:00
+        this.rng = new Random(seed);
+    }
+
     // ── Public API
 
     /**

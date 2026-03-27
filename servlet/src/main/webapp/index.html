@@ -361,6 +361,14 @@
             </div>
         </div>
         <div class="header-right">
+            <label for="patient-selector"></label><select id="patient-selector" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 12px; margin-right: 10px; cursor: pointer;">
+                <option value="user-1">Patient: user-1</option>
+                <option value="user-2">Patient: user-2</option>
+                <option value="user-3">Patient: user-3</option>
+                <option value="user-4">Patient: user-4</option>
+                <option value="user-5">Patient: user-5</option>
+                <option value="user-6">Patient: user-6</option>
+            </select>
             <span class="sim-badge">Simulated</span>
             <div class="status-dot" id="status-dot"></div>
             <span class="last-update" id="last-update">—</span>
@@ -515,7 +523,14 @@
     "use strict";
 
     /* ── Configuration  */
-    const SUBJECT      = "user-1";
+    const urlParams = new URLSearchParams(window.location.search);
+    const SUBJECT = urlParams.get('subject') || 'user-1';
+
+    document.getElementById('patient-selector').value = SUBJECT;
+    document.getElementById('patient-selector').addEventListener('change', (e) => {
+        window.location.search = `?subject=${e.target.value}`;
+    });
+
     const POLL_MS      = 5_000;
     const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 
