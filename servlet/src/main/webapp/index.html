@@ -239,10 +239,75 @@
             .det-grid{grid-template-columns:1fr;}
             .d-card.hero-card,.d-card.stat-card,.d-card.chart-card,.d-card.spark-card,.d-card.ref-card{grid-column:1;grid-row:auto;}
         }
+        /* ── LOGIN VIEW ── */
+        #view-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg) 0%, #e2e8f0 100%);
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+        }
+        .login-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: var(--r20);
+            box-shadow: var(--sh-md);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid var(--border);
+            animation: viewIn 0.4s ease-out;
+        }
+        .login-title { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.5px;}
+        .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--r8);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            background: #f8fafc;
+            transition: border-color 0.2s;
+        }
+        .login-input:focus { outline: none; border-color: var(--blue); background: #fff; }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--r8);
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .login-btn:hover { background: var(--navy-2); transform: translateY(-1px); box-shadow: var(--sh-sm); }
+        .login-err { color: var(--red); font-size: 12px; font-weight: 600; margin-top: 16px; display: none; }
     </style>
 </head>
 <body>
+<div id="view-login">
+    <div class="login-card">
+        <div class="login-title">CortiSense Secure</div>
+        <div class="login-sub">Clinical Portal Access</div>
 
+        <input type="text" id="login-user" class="login-input" placeholder="Username" />
+        <input type="password" id="login-pass" class="login-input" placeholder="Password" />
+
+        <button class="login-btn" onclick="attemptLogin()">Sign In</button>
+        <div id="login-err" class="login-err">Invalid username or password.</div>
+    </div>
+</div>
+
+<div id="app-container" style="display: none;">
 <header class="site-header">
     <!--
       Logo section: 300px wide, 80px tall, overflow:hidden.
@@ -308,7 +373,7 @@
 
 <div id="view-detail" style="display:none">
     <div class="det-nav">
-        <button class="back-btn" onclick="showOverview()">← Overview</button>
+        <button id="btn-back-overview" class="back-btn" onclick="showOverview()">← Overview</button>
         <div>
             <span class="det-title" id="det-name">—</span>
             <span class="det-sub">Individual Patient Record</span>
@@ -339,7 +404,7 @@
             </div>
             <canvas id="history-canvas"></canvas>
         </div>
-        <div class="d-card stat-card">
+        <div id="card-session-stats" class="d-card stat-card">
             <div class="d-card-title">Session Statistics</div>
             <div class="d-stats-grid">
                 <div class="d-stat"><div class="d-stat-lbl">Session Peak</div><div class="d-stat-val" id="d-peak">—</div><div class="d-stat-sub">nmol/L</div></div>
@@ -615,7 +680,29 @@
     let rszTmr;
     window.addEventListener('resize',()=>{clearTimeout(rszTmr);rszTmr=setTimeout(()=>{if(document.getElementById('view-detail').style.display!=='none')drawDetHistory();else for(const sid of SUBJECTS){const s=ovStore[sid];if(s&&s.ts.length)drawCardSpark(sid,s.ts,s.cortisol);}},120);});
 
-    buildCards();showOverview();
+    function attemptLogin() {
+        const user = document.getElementById('login-user').value;
+        const pass = document.getElementById('login-pass').value;
+
+        // Hardcoded PoC credentials
+        if (user === 'admin' && pass === 'password') {
+            // Hide login, show app
+            document.getElementById('view-login').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            buildCards();
+            showOverview();
+        } else {
+            // Show error message
+            document.getElementById('login-err').style.display = 'block';
+        }
+    }
+
+    // Allow pressing "Enter" on the password field to log in
+    document.getElementById('login-pass').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') attemptLogin();
+    });
 </script>
+</div>
 </body>
 </html>
