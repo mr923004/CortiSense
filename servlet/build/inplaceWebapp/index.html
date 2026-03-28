@@ -3,1011 +3,619 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>CortiSense — Home Cortisol Monitor</title>
+    <title>CortiSense — Clinical Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
-
     <style>
-        /* ── Design tokens  */
         :root {
-            --teal:       #0d9488;
-            --teal-light: #99f6e4;
-            --teal-bg:    rgba(13,148,136,0.08);
-            --teal-mid:   rgba(13,148,136,0.18);
+            --navy:     #060e24;
+            --navy-2:   #0d1d4a;
+            --blue:     #1565c0;
+            --blue-mid: #1976d2;
+            --sky:      #60b4e8;
+            --blue-50:  #e3f2fd;
+            --blue-100: #bbdefb;
+            --ok:       #15803d;  --ok-bg:   rgba(21,128,61,0.09);  --ok-bd:   rgba(21,128,61,0.25);
+            --amber:    #b45309;  --amber-bg:rgba(180,83,9,0.09);   --amber-bd:rgba(180,83,9,0.25);
+            --red:      #b91c1c;  --red-bg:  rgba(185,28,28,0.09);  --red-bd:  rgba(185,28,28,0.25);
+            --low:      #1d4ed8;  --low-bg:  rgba(29,78,216,0.08);  --low-bd:  rgba(29,78,216,0.22);
+            --ink:      #0f172a;  --ink2:    #1e293b;  --ink3:  #475569;
+            --muted:    #94a3b8;  --border:  rgba(15,23,42,0.07);
+            --card:     #ffffff;  --bg:      #eef2f9;
+            --sh-sm: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+            --sh-md: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.08);
+            --sh-blue: 0 4px 20px rgba(21,101,192,0.18), 0 1px 4px rgba(0,0,0,0.04);
+            --r8:8px; --r12:12px; --r16:16px; --r20:20px;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-            --amber:      #d97706;
-            --amber-bg:   rgba(217,119,6,0.10);
-            --red:        #dc2626;
-            --red-bg:     rgba(220,38,38,0.09);
-            --ok:         #16a34a;
-            --ok-bg:      rgba(22,163,74,0.09);
-            --blue:       #2563eb;
-
-            --ink:        #0f172a;
-            --ink2:       #334155;
-            --muted:      #64748b;
-            --border:     rgba(15,23,42,0.09);
-            --card:       #ffffff;
-            --bg:         #f0fdf9;
-
-            --r8:  8px;
-            --r12: 12px;
-            --r16: 16px;
-
-            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
-            --shadow:    0 2px 8px rgba(0,0,0,0.06), 0 8px 28px rgba(0,0,0,0.08);
+        /* ── HEADER ── */
+        .site-header{
+            height:80px;
+            display:flex;align-items:stretch;
+            position:sticky;top:0;z-index:100;
+            background:linear-gradient(105deg,var(--navy) 0%,var(--navy-2) 100%);
+            box-shadow:0 1px 0 rgba(255,255,255,0.04),0 4px 24px rgba(0,0,0,0.45);
         }
 
-        /* ── Reset & base  */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Sora', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--ink);
-            min-height: 100vh;
-            /* subtle mesh gradient */
-            background-image:
-                    radial-gradient(ellipse 900px 600px at 0% 0%,  rgba(13,148,136,0.14) 0%, transparent 65%),
-                    radial-gradient(ellipse 700px 500px at 100% 80%, rgba(13,148,136,0.08) 0%, transparent 60%),
-                    linear-gradient(180deg, #f0fdf9 0%, #ecfdf5 100%);
+        /*
+          The logo section renders the image at 290px wide (height: auto → ~193px tall).
+          overflow:hidden clips it to the 80px header height, revealing the vertical centre.
+          mix-blend-mode:lighten makes the black background transparent against the dark header.
+        */
+        .hdr-logo-section{
+            width:300px;
+            height:80px;
+            flex-shrink:0;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-right:1px solid rgba(255,255,255,0.07);
+            background:rgba(0,0,0,0.12);
+        }
+        .hdr-logo{
+            width:290px;
+            height:auto; /* ~193px tall — clips to header height via overflow:hidden above */
+            mix-blend-mode:lighten;
+            display:block;
+            flex-shrink:0;
         }
 
-        /* ── Header  */
-        header {
-            position: sticky; top: 0; z-index: 20;
-            background: rgba(240,253,249,0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+        .hdr-content{
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px 0 22px;
         }
+        .hdr-mid-title{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,0.55);}
+        .hdr-mid-sub{font-size:10px;font-weight:400;color:rgba(255,255,255,0.28);margin-top:2px;letter-spacing:0.3px;}
+        .hdr-right{display:flex;align-items:center;gap:12px;}
 
-        .header-inner {
-            max-width: 1100px; margin: 0 auto;
-            padding: 14px 24px;
-            display: flex; align-items: center; justify-content: space-between; gap: 16px;
-            flex-wrap: wrap;
+        .hdr-simtime{
+            display:flex;flex-direction:column;align-items:center;
+            padding:5px 14px;border-radius:10px;
+            background:rgba(96,180,232,0.10);border:1px solid rgba(96,180,232,0.20);
         }
+        .hdr-sim-label{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(96,180,232,0.65);}
+        .hdr-sim-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--sky);line-height:1.1;letter-spacing:1px;}
+        .hdr-sim-day{font-size:8px;color:rgba(96,180,232,0.50);font-family:'DM Mono',monospace;}
 
-        .brand { display: flex; align-items: center; gap: 12px; }
+        .hdr-div{width:1px;height:28px;background:rgba(255,255,255,0.08);}
+        .hdr-live-wrap{display:flex;align-items:center;gap:6px;}
+        .live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;animation:lp 2.4s ease-in-out infinite;}
+        @keyframes lp{0%,100%{box-shadow:0 0 0 0 transparent;}50%{box-shadow:0 0 0 5px rgba(74,222,128,0.14);}}
+        .hdr-live-text{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.45);}
+        .hdr-clock{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.28);}
+        .hdr-doctor{display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:var(--r8);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);}
+        .doc-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue-mid));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+        .doc-name{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85);}
+        .doc-role{font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px;}
 
-        .brand-icon {
-            width: 40px; height: 40px; border-radius: 10px;
-            background: linear-gradient(135deg, var(--teal) 0%, #0f766e 100%);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 14px rgba(13,148,136,0.35);
-            flex-shrink: 0;
-        }
+        /* ── ALERT ── */
+        .alert-banner{display:none;position:sticky;top:80px;z-index:99;padding:10px 24px;background:rgba(185,28,28,0.08);border-bottom:1px solid rgba(185,28,28,0.20);}
+        .alert-banner.visible{display:flex;align-items:center;gap:10px;}
+        .alert-icon{font-size:14px;flex-shrink:0;}
+        .alert-text{font-size:12px;font-weight:600;color:#b91c1c;flex:1;}
+        .alert-dismiss{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;padding:3px 8px;border-radius:6px;}
+        .alert-dismiss:hover{background:rgba(0,0,0,0.06);}
 
-        .brand-icon svg { width: 22px; height: 22px; fill: #fff; }
+        /* ── VIEW TRANSITION ── */
+        @keyframes viewIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+        .view-anim{animation:viewIn 0.22s ease-out;}
 
-        .brand-text h1 {
-            font-size: 17px; font-weight: 800; letter-spacing: -0.3px;
-            color: var(--ink); line-height: 1.1;
-        }
+        /* ── OVERVIEW ── */
+        #view-overview{max-width:1340px;margin:0 auto;padding:26px 22px 64px;}
+        .ov-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+        .ov-title{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;}
+        .ov-title-sub{font-size:12px;font-weight:400;color:var(--muted);margin-left:10px;}
+        .ov-pills{display:flex;gap:7px;flex-wrap:wrap;}
+        .ov-pill{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;}
+        .ov-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+        .p-total   {background:rgba(21,101,192,0.08);color:var(--blue);  border:1px solid rgba(21,101,192,0.18);}
+        .p-normal  {background:var(--ok-bg);         color:var(--ok);    border:1px solid var(--ok-bd);}
+        .p-elevated{background:var(--amber-bg);       color:var(--amber); border:1px solid var(--amber-bd);}
+        .p-critical{background:var(--red-bg);         color:var(--red);   border:1px solid var(--red-bd);}
+        .patient-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+        @media(max-width:1100px){.patient-grid{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:660px) {.patient-grid{grid-template-columns:1fr;}}
 
-        .brand-text .tagline {
-            font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
-        }
+        /* ── PATIENT CARD ── */
+        .pt-card{background:var(--card);border-radius:var(--r20);box-shadow:var(--sh-sm);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:box-shadow 0.22s,transform 0.18s;display:flex;flex-direction:column;border-top:3px solid #e2e8f0;}
+        .pt-card:hover{box-shadow:var(--sh-blue);transform:translateY(-3px);}
+        .pt-card.lv-normal  {border-top-color:var(--ok);}
+        .pt-card.lv-elevated{border-top-color:var(--amber);}
+        .pt-card.lv-critical{border-top-color:var(--red);animation:cg 2.5s ease-in-out infinite;}
+        .pt-card.lv-low     {border-top-color:var(--low);}
+        @keyframes cg{0%,100%{box-shadow:var(--sh-sm);}50%{box-shadow:0 0 0 3px rgba(185,28,28,0.15),var(--sh-sm);}}
+        .ptc-head{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 18px 0;}
+        .ptc-id{font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--ink3);text-transform:uppercase;}
+        .ptc-badge{font-size:8px;font-weight:800;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:0.6px;margin-top:1px;}
+        .ptc-badge.lv-normal  {background:var(--ok-bg);   color:var(--ok);   border:1px solid var(--ok-bd);}
+        .ptc-badge.lv-elevated{background:var(--amber-bg);color:var(--amber); border:1px solid var(--amber-bd);}
+        .ptc-badge.lv-critical{background:var(--red-bg);  color:var(--red);  border:1px solid var(--red-bd);}
+        .ptc-badge.lv-low     {background:var(--low-bg);  color:var(--low);  border:1px solid var(--low-bd);}
+        .ptc-badge.lv-loading {background:#f8fafc;color:var(--muted);border:1px solid #e2e8f0;}
+        .ptc-value-row{display:flex;align-items:baseline;gap:4px;padding:10px 18px 2px;}
+        .ptc-value{font-family:'DM Mono',monospace;font-size:50px;font-weight:500;line-height:1;letter-spacing:-1.5px;transition:color 0.3s;}
+        .ptc-value.lv-normal  {color:var(--blue);}
+        .ptc-value.lv-elevated{color:var(--amber);}
+        .ptc-value.lv-critical{color:var(--red);}
+        .ptc-value.lv-low     {color:var(--low);}
+        .ptc-value.lv-loading {color:#e2e8f0;}
+        .ptc-unit{font-size:12px;color:var(--muted);margin-bottom:2px;}
+        .ptc-trend-arrow{font-size:20px;line-height:1;margin-left:2px;margin-bottom:2px;}
+        .ptc-trend-arrow.up  {color:var(--amber);}
+        .ptc-trend-arrow.down{color:var(--low);}
+        .ptc-trend-arrow.flat{color:var(--ok);}
+        .ptc-phase-wrap{padding:0 18px 10px;}
+        .ptc-phase{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:0.3px;}
+        .ptc-phase.ph-morning_peak{background:rgba(21,101,192,0.09);color:var(--blue);  border:1px solid rgba(21,101,192,0.22);}
+        .ptc-phase.ph-declining   {background:rgba(29,78,216,0.08); color:var(--low);   border:1px solid rgba(29,78,216,0.18);}
+        .ptc-phase.ph-stress_rise {background:var(--amber-bg);      color:var(--amber); border:1px solid var(--amber-bd);}
+        .ptc-phase.ph-nadir       {background:rgba(71,85,105,0.08); color:var(--ink3);  border:1px solid rgba(71,85,105,0.18);}
+        .ptc-phase.ph-baseline    {background:var(--ok-bg);         color:var(--ok);    border:1px solid var(--ok-bd);}
+        .ptc-spark{width:100%;height:56px;display:block;}
+        .ptc-stats{display:flex;padding:4px 18px 12px;gap:0;}
+        .ptc-stat{flex:1;text-align:center;position:relative;}
+        .ptc-stat+.ptc-stat::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:1px;background:var(--border);}
+        .ptc-stat-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);display:block;margin-bottom:3px;}
+        .ptc-stat-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--ink2);}
+        .ptc-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;margin-top:auto;background:linear-gradient(to bottom,#fafcff,#f6f8fd);border-top:1px solid var(--border);}
+        .ptc-footer-left{display:flex;flex-direction:column;gap:1px;}
+        .ptc-ts{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);}
+        .ptc-sim-ts{font-family:'DM Mono',monospace;font-size:8px;color:rgba(148,163,184,0.6);}
+        .ptc-view-btn{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r8);padding:5px 12px;cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;}
+        .ptc-view-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
 
-        .header-right { display: flex; align-items: center; gap: 10px; }
-
-        .status-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--teal);
-            box-shadow: 0 0 0 3px rgba(13,148,136,0.20);
-            animation: pulse-dot 2s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { box-shadow: 0 0 0 3px rgba(13,148,136,0.20); }
-            50%       { box-shadow: 0 0 0 6px rgba(13,148,136,0.08); }
-        }
-
-        .last-update {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px; color: var(--muted);
-        }
-
-        .sim-badge {
-            font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-            color: var(--amber); background: var(--amber-bg);
-            border: 1px solid rgba(217,119,6,0.20);
-            padding: 3px 8px; border-radius: 99px;
-            text-transform: uppercase;
-        }
-
-        /* ── Main layout  */
-        main {
-            max-width: 1100px; margin: 0 auto;
-            padding: 32px 24px 64px;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            grid-template-rows: auto auto auto;
-            gap: 20px;
-        }
-
-        /* ── Card base  */
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--r16);
-            box-shadow: var(--shadow-sm);
-            padding: 24px;
-        }
-
-        /* ── Hero stat card  */
-        .hero-card {
-            grid-column: 1;
-            grid-row: 1;
-            display: flex; flex-direction: column; gap: 0;
-            position: relative; overflow: hidden;
-        }
-
-        .hero-card::before {
-            content: "";
-            position: absolute; top: -40px; right: -40px;
-            width: 180px; height: 180px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(13,148,136,0.12) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-label {
-            font-size: 11px; font-weight: 700; letter-spacing: 1px;
-            color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
-        }
-
-        .hero-value {
-            font-family: 'DM Mono', monospace;
-            font-size: 72px; font-weight: 500; line-height: 1;
-            color: var(--teal); letter-spacing: -2px;
-            transition: color 0.4s;
-        }
-
-        .hero-value.level-high   { color: var(--amber); }
-        .hero-value.level-very-high { color: var(--red); }
-        .hero-value.level-low    { color: var(--blue); }
-
-        .hero-unit {
-            font-size: 18px; font-weight: 300; color: var(--muted);
-            margin-left: 4px; vertical-align: baseline; letter-spacing: 0;
-        }
-
-        .hero-trend {
-            margin-top: 10px;
-            font-family: 'DM Mono', monospace;
-            font-size: 13px; color: var(--muted);
-            display: flex; align-items: center; gap: 6px;
-        }
-
-        .trend-arrow { font-size: 18px; }
-        .trend-up    { color: var(--amber); }
-        .trend-down  { color: var(--blue); }
-        .trend-flat  { color: var(--ok); }
-
-        .phase-pill {
-            display: inline-block;
-            margin-top: 16px;
-            font-size: 12px; font-weight: 700;
-            padding: 5px 12px; border-radius: 99px;
-            letter-spacing: 0.3px;
-        }
-
-        .phase-morning_peak  { background: rgba(13,148,136,0.12); color: var(--teal);  border: 1px solid rgba(13,148,136,0.25); }
-        .phase-declining     { background: rgba(37,99,235,0.09);  color: var(--blue);  border: 1px solid rgba(37,99,235,0.20); }
-        .phase-stress_rise   { background: var(--amber-bg);       color: var(--amber); border: 1px solid rgba(217,119,6,0.25); }
-        .phase-nadir         { background: rgba(100,116,139,0.09); color: var(--muted); border: 1px solid rgba(100,116,139,0.20); }
-        .phase-baseline      { background: var(--ok-bg);          color: var(--ok);   border: 1px solid rgba(22,163,74,0.20); }
-
-        /* ── Stats row ─────────────────────────────────────────────────────────── */
-        .stats-card {
-            grid-column: 1;
-            grid-row: 2;
-        }
-
-        .stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-            margin-top: 6px;
-        }
-
-        .stat-item { display: flex; flex-direction: column; gap: 4px; }
-
-        .stat-label {
-            font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
-            color: var(--muted); text-transform: uppercase;
-        }
-
-        .stat-value {
-            font-family: 'DM Mono', monospace;
-            font-size: 22px; font-weight: 500; color: var(--ink);
-            letter-spacing: -0.5px;
-        }
-
-        .stat-sub { font-size: 11px; color: var(--muted); }
-
-        /* ── Chart card  */
-        .chart-card {
-            grid-column: 2;
-            grid-row: 1 / 3;
-        }
-
-        .card-header {
-            display: flex; align-items: baseline; justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            font-size: 13px; font-weight: 700; color: var(--ink2);
-        }
-
-        .card-sub { font-size: 11px; color: var(--muted); }
-
-        .chart-legend {
-            display: flex; gap: 14px; flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .legend-item {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 11px; color: var(--muted);
-        }
-
-        .legend-swatch {
-            width: 20px; height: 3px; border-radius: 2px;
-        }
-
-        .legend-dash {
-            width: 20px; height: 0;
-            border-top: 2px dashed;
-        }
-
-        #history-canvas {
-            display: block; width: 100%; height: 340px;
-            border-radius: var(--r8);
-        }
-
-        /* ── Sparkline (mini trend strip) */
-        .spark-card {
-            grid-column: 1;
-            grid-row: 3;
-        }
-
-        #spark-canvas {
-            display: block; width: 100%; height: 64px;
-            margin-top: 8px;
-        }
-
-        /* ── Reference table*/
-        .ref-card {
-            grid-column: 2;
-            grid-row: 3;
-        }
-
-        .ref-table {
-            width: 100%; border-collapse: collapse;
-            font-size: 12px; margin-top: 8px;
-        }
-
-        .ref-table th {
-            text-align: left; padding: 6px 10px 6px 0;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.6px;
-            color: var(--muted); text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .ref-table td {
-            padding: 8px 10px 8px 0;
-            border-bottom: 1px solid rgba(15,23,42,0.05);
-            color: var(--ink2);
-            font-family: 'DM Mono', monospace;
-        }
-
-        .ref-table td:first-child { font-family: 'Sora', sans-serif; font-weight: 600; }
-
-        .pill-sm {
-            display: inline-block; padding: 2px 8px; border-radius: 99px;
-            font-size: 10px; font-weight: 700; font-family: 'Sora', sans-serif;
-            letter-spacing: 0.3px;
-        }
-
-        .pill-sm.ok     { background: var(--ok-bg);    color: var(--ok);    border: 1px solid rgba(22,163,74,0.25); }
-        .pill-sm.amber  { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.25); }
-        .pill-sm.red    { background: var(--red-bg);    color: var(--red);   border: 1px solid rgba(220,38,38,0.20); }
-        .pill-sm.info   { background: rgba(37,99,235,0.08); color: var(--blue); border: 1px solid rgba(37,99,235,0.20); }
-
-        /* ── Footer  */
-        footer {
-            text-align: center;
-            padding: 20px 24px 32px;
-            font-size: 11px; color: var(--muted);
-            border-top: 1px solid var(--border);
-        }
-
-        footer strong { color: var(--ink2); }
-
-        /* ── Error / empty state */
-        .no-data { color: var(--muted); font-size: 13px; padding: 24px 0; text-align: center; }
-
-        /* ── Responsive  */
-        @media (max-width: 820px) {
-            main {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-            }
-            .hero-card,
-            .stats-card,
-            .chart-card,
-            .spark-card,
-            .ref-card { grid-column: 1; grid-row: auto; }
+        /* ── DETAIL VIEW ── */
+        #view-detail{max-width:1340px;margin:0 auto;padding:22px 22px 64px;}
+        .det-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+        .back-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r8);padding:6px 14px;cursor:pointer;transition:all 0.15s;}
+        .back-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+        .det-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.2px;}
+        .det-sub{font-size:11px;font-weight:400;color:var(--muted);margin-left:8px;}
+        .det-grid{display:grid;grid-template-columns:290px 1fr;grid-template-rows:auto auto auto;gap:16px;}
+        .d-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r20);box-shadow:var(--sh-sm);padding:22px;}
+        .d-card.hero-card {grid-column:1;grid-row:1;position:relative;overflow:hidden;}
+        .d-card.stat-card {grid-column:1;grid-row:2;}
+        .d-card.chart-card{grid-column:2;grid-row:1/3;}
+        .d-card.spark-card{grid-column:1;grid-row:3;}
+        .d-card.ref-card  {grid-column:2;grid-row:3;}
+        .hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 200% 160% at 110% -20%,rgba(21,101,192,0.06) 0%,transparent 60%);pointer-events:none;}
+        .d-lbl{font-size:8px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+        .d-val{font-family:'DM Mono',monospace;font-size:62px;font-weight:500;line-height:1;letter-spacing:-2px;color:var(--blue);transition:color 0.4s;}
+        .d-val.lv-elevated{color:var(--amber);}
+        .d-val.lv-critical{color:var(--red);}
+        .d-val.lv-low     {color:var(--low);}
+        .d-unit{font-size:15px;font-weight:300;color:var(--muted);margin-left:3px;vertical-align:baseline;}
+        .d-trend{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+        .d-arr{font-size:14px;}
+        .d-arr.up  {color:var(--amber);}
+        .d-arr.down{color:var(--low);}
+        .d-arr.flat{color:var(--ok);}
+        .d-phase-pill{display:inline-block;margin-top:12px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;}
+        .d-phase-pill.ph-morning_peak{background:rgba(21,101,192,0.09);color:var(--blue);  border:1px solid rgba(21,101,192,0.22);}
+        .d-phase-pill.ph-declining   {background:rgba(29,78,216,0.08); color:var(--low);   border:1px solid rgba(29,78,216,0.18);}
+        .d-phase-pill.ph-stress_rise {background:var(--amber-bg);      color:var(--amber); border:1px solid var(--amber-bd);}
+        .d-phase-pill.ph-nadir       {background:rgba(71,85,105,0.08); color:var(--ink3);  border:1px solid rgba(71,85,105,0.18);}
+        .d-phase-pill.ph-baseline    {background:var(--ok-bg);         color:var(--ok);    border:1px solid var(--ok-bd);}
+        .circ-wrap{margin-top:18px;}
+        .circ-lbl{font-size:8px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+        #circadian-canvas{width:100%;height:40px;display:block;}
+        .circ-simtime{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-top:5px;}
+        .d-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:6px;}
+        .d-stat{display:flex;flex-direction:column;gap:2px;}
+        .d-stat-lbl{font-size:8px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);}
+        .d-stat-val{font-family:'DM Mono',monospace;font-size:19px;font-weight:500;color:var(--ink);}
+        .d-stat-sub{font-size:9px;color:var(--muted);}
+        .d-stat-val.roc-up  {color:var(--amber);}
+        .d-stat-val.roc-down{color:var(--low);}
+        .d-stat-val.roc-flat{color:var(--ok);}
+        .d-card-title{font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:10px;}
+        .d-card-sub{font-size:10px;font-weight:400;color:var(--muted);margin-left:8px;}
+        .chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+        .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);}
+        .leg-sw{width:16px;height:2.5px;border-radius:2px;}
+        .leg-dash{width:16px;border-top:2px dashed;}
+        #history-canvas{display:block;width:100%;height:300px;border-radius:var(--r8);cursor:grab;}
+        #history-canvas:active{cursor:grabbing;}
+        #spark-canvas{display:block;width:100%;height:56px;margin-top:10px;}
+        .ref-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+        .ref-table th{text-align:left;padding:5px 8px 5px 0;font-size:9px;font-weight:800;letter-spacing:0.7px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+        .ref-table td{padding:8px 8px 8px 0;border-bottom:1px solid rgba(15,23,42,0.04);color:var(--ink2);font-family:'DM Mono',monospace;font-size:11px;}
+        .ref-table td:first-child{font-family:'Sora',sans-serif;font-weight:600;font-size:11px;}
+        .pill-sm{display:inline-block;padding:2px 9px;border-radius:99px;font-size:9px;font-weight:700;font-family:'Sora',sans-serif;letter-spacing:0.3px;}
+        .pill-sm.ok   {background:var(--ok-bg);   color:var(--ok);   border:1px solid var(--ok-bd);}
+        .pill-sm.amber{background:var(--amber-bg);color:var(--amber); border:1px solid var(--amber-bd);}
+        .pill-sm.red  {background:var(--red-bg);  color:var(--red);  border:1px solid var(--red-bd);}
+        .pill-sm.info {background:var(--low-bg);  color:var(--low);  border:1px solid var(--low-bd);}
+        footer{text-align:center;padding:20px 24px;font-size:10px;color:var(--muted);letter-spacing:0.2px;border-top:1px solid var(--border);}
+        footer strong{color:var(--ink2);}
+        @media(max-width:840px){
+            .det-grid{grid-template-columns:1fr;}
+            .d-card.hero-card,.d-card.stat-card,.d-card.chart-card,.d-card.spark-card,.d-card.ref-card{grid-column:1;grid-row:auto;}
         }
     </style>
 </head>
 <body>
 
-<!-- ── Header  -->
-<header>
-    <div class="header-inner">
-        <div class="brand">
-            <div class="brand-icon">
-                <!-- Molecule / waveform icon -->
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm14 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zM7 12h2.5l2-4 3 8 2-4H19"/>
-                </svg>
-            </div>
-            <div class="brand-text">
-                <h1>CortiSense</h1>
-                <div class="tagline">Home Cortisol Monitoring · DAPP Proof of Concept</div>
-            </div>
+<header class="site-header">
+    <!--
+      Logo section: 300px wide, 80px tall, overflow:hidden.
+      The <img> renders at 290px wide × ~193px tall (width:290px; height:auto).
+      overflow:hidden clips the 193px down to 80px, showing the vertical centre.
+      mix-blend-mode:lighten removes the black logo background against the dark header.
+      Net result: the logo appears at ~290px wide — a dramatic improvement over sizing by height alone.
+    -->
+    <div class="hdr-logo-section">
+        <img src="/logo.png" alt="CortiSense" class="hdr-logo" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <div class="hdr-content">
+        <div>
+            <div class="hdr-mid-title">Clinical Dashboard</div>
+            <div class="hdr-mid-sub">Wearable Cortisol Monitoring · Proof of Concept</div>
         </div>
-        <div class="header-right">
-            <label for="patient-selector"></label><select id="patient-selector" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 12px; margin-right: 10px; cursor: pointer;">
-                <option value="user-1">Patient: user-1</option>
-                <option value="user-2">Patient: user-2</option>
-                <option value="user-3">Patient: user-3</option>
-                <option value="user-4">Patient: user-4</option>
-                <option value="user-5">Patient: user-5</option>
-                <option value="user-6">Patient: user-6</option>
-            </select>
-            <span class="sim-badge">Simulated</span>
-            <div class="status-dot" id="status-dot"></div>
-            <span class="last-update" id="last-update">—</span>
+        <div class="hdr-right">
+            <div class="hdr-simtime">
+                <div class="hdr-sim-label">Sim Time</div>
+                <div class="hdr-sim-val" id="hdr-sim-val">—</div>
+                <div class="hdr-sim-day" id="hdr-sim-day">—</div>
+            </div>
+            <div class="hdr-div"></div>
+            <div class="hdr-live-wrap">
+                <div class="live-dot"></div>
+                <div class="hdr-live-text" id="hdr-status">Live</div>
+            </div>
+            <div class="hdr-clock" id="hdr-clock"></div>
+            <div class="hdr-div"></div>
+            <div class="hdr-doctor">
+                <div class="doc-avatar">Dr</div>
+                <div>
+                    <div class="doc-name">Clinical User</div>
+                    <div class="doc-role">DAPP Proof of Concept</div>
+                </div>
+            </div>
         </div>
     </div>
 </header>
 
-<!-- ── Main grid -->
-<main>
+<div class="alert-banner" id="alert-banner">
+    <div class="alert-icon">⚠</div>
+    <div class="alert-text" id="alert-text">Critical cortisol detected</div>
+    <button class="alert-dismiss" onclick="dismissAlert()">Dismiss</button>
+</div>
 
-    <!-- Hero current reading -->
-    <div class="card hero-card">
-        <div class="hero-label">Current Cortisol</div>
-        <div class="hero-value" id="hero-value">
-            <span id="current-val">—</span><span class="hero-unit">nmol/L</span>
+<div id="view-overview">
+    <div class="ov-toolbar">
+        <div>
+            <span class="ov-title">Patient Overview</span>
+            <span class="ov-title-sub">6 patients monitored</span>
         </div>
-        <div class="hero-trend">
-            <span class="trend-arrow" id="trend-arrow">—</span>
-            <span id="trend-text">Waiting for data…</span>
-        </div>
-        <div id="phase-pill" class="phase-pill phase-baseline">baseline</div>
-    </div>
-
-    <!-- Stats -->
-    <div class="card stats-card">
-        <div class="card-title">Session Statistics</div>
-        <div class="stats-grid" id="stats-grid">
-            <div class="stat-item">
-                <div class="stat-label">Session Peak</div>
-                <div class="stat-value" id="stat-peak">—</div>
-                <div class="stat-sub">nmol/L</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Session Low</div>
-                <div class="stat-value" id="stat-low">—</div>
-                <div class="stat-sub">nmol/L</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">1-hour Mean</div>
-                <div class="stat-value" id="stat-mean1h">—</div>
-                <div class="stat-sub">nmol/L</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Readings</div>
-                <div class="stat-value" id="stat-count">0</div>
-                <div class="stat-sub">this session</div>
-            </div>
+        <div class="ov-pills">
+            <div class="ov-pill p-total">   <span class="dot"></span><span id="ov-total">6</span>&nbsp;Monitored</div>
+            <div class="ov-pill p-normal">  <span class="dot"></span><span id="ov-norm">—</span>&nbsp;Normal</div>
+            <div class="ov-pill p-elevated"><span class="dot"></span><span id="ov-elev">—</span>&nbsp;Elevated</div>
+            <div class="ov-pill p-critical"><span class="dot"></span><span id="ov-crit">—</span>&nbsp;Critical</div>
         </div>
     </div>
+    <div class="patient-grid" id="patient-grid"></div>
+</div>
 
-    <!-- Full history chart -->
-    <div class="card chart-card">
-        <div class="card-header">
-            <div>
-                <div class="card-title">Cortisol History</div>
-                <div class="card-sub">Simulated wearable sensor output · nmol/L over time</div>
+<div id="view-detail" style="display:none">
+    <div class="det-nav">
+        <button class="back-btn" onclick="showOverview()">← Overview</button>
+        <div>
+            <span class="det-title" id="det-name">—</span>
+            <span class="det-sub">Individual Patient Record</span>
+        </div>
+    </div>
+    <div class="det-grid">
+        <div class="d-card hero-card">
+            <div class="d-lbl">Current Cortisol</div>
+            <div class="d-val" id="d-val"><span id="d-cur">—</span><span class="d-unit">nmol/L</span></div>
+            <div class="d-trend"><span class="d-arr" id="d-arr">—</span><span id="d-trend-txt">Loading…</span></div>
+            <div id="d-phase" class="d-phase-pill ph-baseline">Baseline</div>
+            <div class="circ-wrap">
+                <div class="circ-lbl">Circadian Position</div>
+                <canvas id="circadian-canvas"></canvas>
+                <div class="circ-simtime" id="d-simtime">Sim —</div>
             </div>
         </div>
-        <div class="chart-legend">
-            <div class="legend-item">
-                <div class="legend-swatch" style="background:var(--teal)"></div>
-                <span>Cortisol</span>
+        <div class="d-card chart-card">
+            <div style="display:flex;align-items:baseline;margin-bottom:10px;">
+                <div class="d-card-title" style="margin-bottom:0;">Cortisol History</div>
+                <span class="d-card-sub">scroll to zoom · drag to pan · dbl-click reset</span>
             </div>
-            <div class="legend-item">
-                <div class="legend-dash" style="border-color:var(--amber);opacity:0.7"></div>
-                <span>High amber (550)</span>
+            <div class="chart-legend">
+                <div class="leg-item"><div class="leg-sw" style="background:#1565c0"></div>Cortisol</div>
+                <div class="leg-item"><div class="leg-dash" style="border-color:#b45309;opacity:.8"></div>Elevated (550)</div>
+                <div class="leg-item"><div class="leg-dash" style="border-color:#b91c1c;opacity:.8"></div>Critical (700)</div>
+                <div class="leg-item"><div class="leg-dash" style="border-color:#1d4ed8;opacity:.7"></div>Low (150)</div>
             </div>
-            <div class="legend-item">
-                <div class="legend-dash" style="border-color:var(--red);opacity:0.7"></div>
-                <span>Very high (700)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-dash" style="border-color:var(--blue);opacity:0.7"></div>
-                <span>Low (150)</span>
+            <canvas id="history-canvas"></canvas>
+        </div>
+        <div class="d-card stat-card">
+            <div class="d-card-title">Session Statistics</div>
+            <div class="d-stats-grid">
+                <div class="d-stat"><div class="d-stat-lbl">Session Peak</div><div class="d-stat-val" id="d-peak">—</div><div class="d-stat-sub">nmol/L</div></div>
+                <div class="d-stat"><div class="d-stat-lbl">Session Low</div><div class="d-stat-val" id="d-low">—</div><div class="d-stat-sub">nmol/L</div></div>
+                <div class="d-stat"><div class="d-stat-lbl">Readings</div><div class="d-stat-val" id="d-count">0</div><div class="d-stat-sub">this session</div></div>
+                <div class="d-stat"><div class="d-stat-lbl">1-hr Mean</div><div class="d-stat-val" id="d-mean">—</div><div class="d-stat-sub">nmol/L</div></div>
+                <div class="d-stat"><div class="d-stat-lbl">Rate of Change</div><div class="d-stat-val" id="d-roc">—</div><div class="d-stat-sub">nmol/L·sim h⁻¹</div></div>
+                <div class="d-stat"><div class="d-stat-lbl">Sim Day</div><div class="d-stat-val" id="d-simday">—</div><div class="d-stat-sub">of monitoring</div></div>
             </div>
         </div>
-        <canvas id="history-canvas"></canvas>
-    </div>
-
-    <!-- Mini sparkline: last 2 hours -->
-    <div class="card spark-card">
-        <div class="card-header">
-            <div class="card-title">Last 2-hour trend</div>
-            <div class="card-sub" id="spark-sub">—</div>
+        <div class="d-card spark-card">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <div class="d-card-title" style="margin-bottom:0;">2-Hour Trend</div>
+                <div style="font-size:10px;color:var(--muted);" id="d-spark-sub">—</div>
+            </div>
+            <canvas id="spark-canvas"></canvas>
         </div>
-        <canvas id="spark-canvas"></canvas>
+        <div class="d-card ref-card">
+            <div class="d-card-title">Reference Ranges</div>
+            <table class="ref-table">
+                <thead><tr><th>Phase / Threshold</th><th>Range (nmol/L)</th><th>Status</th></tr></thead>
+                <tbody>
+                <tr><td>Morning peak (08:00–10:00)</td><td>400–620</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                <tr><td>Daytime declining</td><td>150–400</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                <tr><td>Evening / nadir</td><td>80–200</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                <tr><td>Stress-rise event</td><td>+100–300 above base</td><td><span class="pill-sm amber">Expected</span></td></tr>
+                <tr><td>Elevated threshold</td><td>&gt; 550</td><td><span class="pill-sm amber">Review</span></td></tr>
+                <tr><td>Critical threshold</td><td>&gt; 700</td><td><span class="pill-sm red">Alert</span></td></tr>
+                <tr><td>Low threshold</td><td>&lt; 150</td><td><span class="pill-sm info">Low</span></td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 
-    <!-- Reference ranges -->
-    <div class="card ref-card">
-        <div class="card-title">Reference Ranges</div>
-        <table class="ref-table">
-            <thead>
-            <tr>
-                <th>Phase / Threshold</th>
-                <th>Range (nmol/L)</th>
-                <th>Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Morning peak (08:00–10:00)</td>
-                <td>400–620</td>
-                <td><span class="pill-sm ok">Normal</span></td>
-            </tr>
-            <tr>
-                <td>Daytime declining</td>
-                <td>150–400</td>
-                <td><span class="pill-sm ok">Normal</span></td>
-            </tr>
-            <tr>
-                <td>Evening / nadir</td>
-                <td>80–200</td>
-                <td><span class="pill-sm ok">Normal</span></td>
-            </tr>
-            <tr>
-                <td>Stress-rise event</td>
-                <td>+100–300 above base</td>
-                <td><span class="pill-sm amber">Expected</span></td>
-            </tr>
-            <tr>
-                <td>High amber threshold</td>
-                <td>&gt; 550</td>
-                <td><span class="pill-sm amber">Review</span></td>
-            </tr>
-            <tr>
-                <td>Very high threshold</td>
-                <td>&gt; 700</td>
-                <td><span class="pill-sm red">Alert</span></td>
-            </tr>
-            <tr>
-                <td>Low threshold</td>
-                <td>&lt; 150</td>
-                <td><span class="pill-sm info">Low</span></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
-</main>
-
-<!-- ── Footer  -->
 <footer>
-    <strong>CortiSense v0.1</strong> &nbsp;·&nbsp;
+    <strong>CortiSense v2.0</strong> &nbsp;·&nbsp;
     Simulated data only — not for clinical use &nbsp;·&nbsp;
-    DAPP Year 3 Proof of Concept &nbsp;·&nbsp;
-    Data source: in-memory simulation (no external services)
+    Imperial College London · DAPP Year 3 Proof of Concept
 </footer>
 
-<!-- ── JavaScript  -->
 <script>
     "use strict";
+    const SUBJECTS=['user-1','user-2','user-3','user-4','user-5','user-6'];
+    const PT_LABELS={'user-1':'Patient 001','user-2':'Patient 002','user-3':'Patient 003','user-4':'Patient 004','user-5':'Patient 005','user-6':'Patient 006'};
+    const POLL_MS=5000,TWO_H=7200000;
+    const THR={veryHigh:700,highAmber:550,lowAmber:150,low:80};
+    const PH_LABELS={morning_peak:'Morning Peak',declining:'Declining',stress_rise:'Stress Rise',nadir:'Nadir',baseline:'Baseline'};
+    const C={blue:'#1565c0',amber:'#b45309',red:'#b91c1c',low:'#1d4ed8',ok:'#15803d',muted:'#94a3b8',grid:'rgba(15,23,42,0.04)',border:'rgba(15,23,42,0.08)'};
 
-    /* ── Configuration  */
-    const urlParams = new URLSearchParams(window.location.search);
-    const SUBJECT = urlParams.get('subject') || 'user-1';
+    const ovStore={};
+    let detTs=[],detC=[],detPhase='baseline',detPrev=null;
+    let ovTimer=null,detTimer=null,curSubject=null;
+    let zoomCustom=false,vMinT=0,vMaxT=0,dragging=false,lastMX=0;
+    let alertDismissed=false;
 
-    document.getElementById('patient-selector').value = SUBJECT;
-    document.getElementById('patient-selector').addEventListener('change', (e) => {
-        window.location.search = `?subject=${e.target.value}`;
-    });
+    function getSimTime(n){
+        if(!n)return null;
+        const total=21600+n*60,day=Math.floor(total/86400)+1,secs=total%86400;
+        const h=String(Math.floor(secs/3600)).padStart(2,'0'),m=String(Math.floor((secs%3600)/60)).padStart(2,'0');
+        return{time:h+':'+m,day,secs};
+    }
+    function updateSimDisplay(n){
+        const st=getSimTime(n);if(!st)return;
+        document.getElementById('hdr-sim-val').textContent=st.time;
+        document.getElementById('hdr-sim-day').textContent='Sim Day '+st.day;
+    }
+    function clock(){
+        const n=new Date();
+        document.getElementById('hdr-clock').textContent=
+            n.toLocaleDateString([],{weekday:'short',day:'2-digit',month:'short'})+' · '+
+            n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    }
+    setInterval(clock,1000);clock();
 
-    const POLL_MS      = 5_000;
-    const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+    function checkAlerts(){
+        if(alertDismissed)return;
+        const crits=[];
+        for(const sid of SUBJECTS){const s=ovStore[sid];if(!s||!s.cortisol.length)continue;const v=s.cortisol[s.cortisol.length-1];if(v>=THR.veryHigh||v<THR.low)crits.push(PT_LABELS[sid]+' ('+v.toFixed(1)+' nmol/L)');}
+        const b=document.getElementById('alert-banner');
+        if(crits.length){b.className='alert-banner visible';document.getElementById('alert-text').textContent='Critical cortisol: '+crits.join(', ');}
+        else b.className='alert-banner';
+    }
+    function dismissAlert(){alertDismissed=true;document.getElementById('alert-banner').className='alert-banner';}
 
-    const THRESHOLDS = {
-        veryHigh:  700,
-        highAmber: 550,
-        lowAmber:  150,
-        low:       80,
-    };
+    function getLevel(v){if(v>=THR.veryHigh)return'critical';if(v>=THR.highAmber)return'elevated';if(v<THR.low)return'critical';if(v<THR.lowAmber)return'low';return'normal';}
+    function getLvLabel(l){return{normal:'Normal',elevated:'Elevated',critical:'Critical',low:'Low'}[l]||'—';}
+    function animView(id){const el=document.getElementById(id);el.classList.remove('view-anim');void el.offsetWidth;el.classList.add('view-anim');}
 
-    const PHASE_LABELS = {
-        morning_peak: "Morning Peak",
-        declining:    "Declining",
-        stress_rise:  "Stress Rise",
-        nadir:        "Nadir",
-        baseline:     "Baseline",
-    };
+    function showOverview(){
+        document.getElementById('view-overview').style.display='';document.getElementById('view-detail').style.display='none';
+        animView('view-overview');clearInterval(detTimer);detTimer=null;curSubject=null;detTs=[];detC=[];alertDismissed=false;
+        fetchAllOv();ovTimer=setInterval(fetchAllOv,POLL_MS);
+    }
+    function showDetail(sid){
+        document.getElementById('view-overview').style.display='none';document.getElementById('view-detail').style.display='';
+        animView('view-detail');clearInterval(ovTimer);ovTimer=null;
+        curSubject=sid;detTs=[];detC=[];detPhase='baseline';detPrev=null;zoomCustom=false;
+        document.getElementById('det-name').textContent=PT_LABELS[sid]||sid;
+        fetchDet();detTimer=setInterval(fetchDet,POLL_MS);
+    }
 
-    const COLORS = {
-        teal:   "#0d9488",
-        amber:  "#d97706",
-        red:    "#dc2626",
-        blue:   "#2563eb",
-        muted:  "#94a3b8",
-        border: "rgba(15,23,42,0.10)",
-        gridLine:"rgba(15,23,42,0.05)",
-    };
-
-    /* ── State  */
-    let allTs       = [];
-    let allCortisol = [];
-    let currentPhase = "baseline";
-    let prevValue    = null;
-
-    /* ── Interactive View State (NEW) ── */
-    let customView = false; // True if the user has zoomed/panned
-    let viewMinT = 0;       // The left edge of the visible graph
-    let viewMaxT = 0;       // The right edge of the visible graph
-
-    /* ── DOM refs  */
-    const elCurrentVal = document.getElementById("current-val");
-    const elHeroValue  = document.getElementById("hero-value");
-    const elTrendArrow = document.getElementById("trend-arrow");
-    const elTrendText  = document.getElementById("trend-text");
-    const elPhasePill  = document.getElementById("phase-pill");
-    const elLastUpdate = document.getElementById("last-update");
-    const elStatPeak   = document.getElementById("stat-peak");
-    const elStatLow    = document.getElementById("stat-low");
-    const elStatMean1h = document.getElementById("stat-mean1h");
-    const elStatCount  = document.getElementById("stat-count");
-    const elSparkSub   = document.getElementById("spark-sub");
-
-    const histCanvas  = document.getElementById("history-canvas");
-    const sparkCanvas = document.getElementById("spark-canvas");
-
-    histCanvas.style.cursor = 'grab';
-
-    /* ── Fetch & merge  */
-    async function fetchAndRender() {
-        try {
-            const resp = await fetch(`/telemetry?subject=${SUBJECT}`, {cache: "no-store"});
-            if (!resp.ok) throw new Error(resp.status);
-            const data = await resp.json();
-
-            mergeData(data);
-            render();
-
-            // Blink status dot green
-            const dot = document.getElementById("status-dot");
-            dot.style.background = "#16a34a";
-            setTimeout(() => { dot.style.background = ""; }, 600);
-
-        } catch (err) {
-            console.warn("Fetch error:", err);
+    function buildCards(){
+        const grid=document.getElementById('patient-grid');grid.innerHTML='';
+        for(const sid of SUBJECTS){
+            const el=document.createElement('div');el.className='pt-card';el.id='card-'+sid;el.onclick=()=>showDetail(sid);
+            el.innerHTML=
+                `<div class="ptc-head"><div class="ptc-id">${PT_LABELS[sid]}</div><div class="ptc-badge lv-loading" id="badge-${sid}">Loading</div></div>`+
+                `<div class="ptc-value-row"><div class="ptc-value lv-loading" id="cval-${sid}">—</div><div class="ptc-unit">nmol/L</div><span class="ptc-trend-arrow" id="ctarrow-${sid}"></span></div>`+
+                `<div class="ptc-phase-wrap"><div class="ptc-phase ph-baseline" id="cph-${sid}">—</div></div>`+
+                `<canvas class="ptc-spark" id="csp-${sid}"></canvas>`+
+                `<div class="ptc-stats"><div class="ptc-stat"><span class="ptc-stat-lbl">Peak</span><span class="ptc-stat-val" id="cpk-${sid}">—</span></div><div class="ptc-stat"><span class="ptc-stat-lbl">Low</span><span class="ptc-stat-val" id="clo-${sid}">—</span></div><div class="ptc-stat"><span class="ptc-stat-lbl">1h Mean</span><span class="ptc-stat-val" id="cmn-${sid}">—</span></div></div>`+
+                `<div class="ptc-footer"><div class="ptc-footer-left"><span class="ptc-ts" id="cts-${sid}">—</span><span class="ptc-sim-ts" id="csim-${sid}">—</span></div><button class="ptc-view-btn">View →</button></div>`;
+            grid.appendChild(el);
         }
     }
 
-    function mergeData(data) {
-        const incoming_ts  = Array.isArray(data.ts)       ? data.ts       : [];
-        const incoming_cor = Array.isArray(data.cortisol)  ? data.cortisol : [];
-        const n = Math.min(incoming_ts.length, incoming_cor.length);
-
-        for (let i = 0; i < n; i++) {
-            const t = incoming_ts[i];
-            const v = incoming_cor[i];
-            if (typeof t !== "number" || typeof v !== "number") continue;
-            if (allTs.length === 0 || t > allTs[allTs.length - 1]) {
-                allTs.push(t);
-                allCortisol.push(v);
-            }
-        }
-
-        if (typeof data.phase === "string") currentPhase = data.phase;
+    async function fetchOneOv(sid){
+        try{
+            const r=await fetch(`/telemetry?subject=${sid}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();
+            const iTs=Array.isArray(d.ts)?d.ts:[],iC=Array.isArray(d.cortisol)?d.cortisol:[];
+            if(!ovStore[sid])ovStore[sid]={ts:[],cortisol:[],phase:'baseline'};const s=ovStore[sid];
+            for(let i=0;i<Math.min(iTs.length,iC.length);i++){if(typeof iTs[i]!=='number'||typeof iC[i]!=='number')continue;if(!s.ts.length||iTs[i]>s.ts[s.ts.length-1]){s.ts.push(iTs[i]);s.cortisol.push(iC[i]);}}
+            if(typeof d.phase==='string')s.phase=d.phase;
+        }catch(e){}
+    }
+    async function fetchAllOv(){
+        await Promise.all(SUBJECTS.map(s=>fetchOneOv(s)));
+        let norm=0,elev=0,crit=0;
+        for(const sid of SUBJECTS){const s=ovStore[sid];if(!s||!s.ts.length)continue;const v=s.cortisol[s.cortisol.length-1],lv=getLevel(v);if(lv==='normal')norm++;else if(lv==='elevated')elev++;else if(lv==='critical')crit++;updateCard(sid,s,v,lv);}
+        document.getElementById('ov-norm').textContent=norm;document.getElementById('ov-elev').textContent=elev;document.getElementById('ov-crit').textContent=crit;
+        document.getElementById('hdr-status').textContent='Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        updateSimDisplay(ovStore['user-1']?.ts.length||0);checkAlerts();
     }
 
-    /* ── Render  */
-    function render() {
-        if (allTs.length === 0) return;
-
-        const latest = allCortisol[allCortisol.length - 1];
-        const now    = allTs[allTs.length - 1];
-
-        // ── Auto-fit graph window if user hasn't zoomed
-        if (!customView) {
-            viewMinT = allTs[0];
-            viewMaxT = allTs[allTs.length - 1];
-        }
-
-        // ── Current value
-        elCurrentVal.textContent = fmt(latest, 1);
-        elLastUpdate.textContent = fmtTime(now);
-        elHeroValue.className = "hero-value " + levelClass(latest);
-
-        // ── Trend
-        if (prevValue !== null) {
-            const delta = latest - prevValue;
-            if (delta > 5) {
-                elTrendArrow.textContent = "↑";
-                elTrendArrow.className = "trend-arrow trend-up";
-                elTrendText.textContent = `+${fmt(delta, 1)} from last reading`;
-            } else if (delta < -5) {
-                elTrendArrow.textContent = "↓";
-                elTrendArrow.className = "trend-arrow trend-down";
-                elTrendText.textContent = `${fmt(delta, 1)} from last reading`;
-            } else {
-                elTrendArrow.textContent = "→";
-                elTrendArrow.className = "trend-arrow trend-flat";
-                elTrendText.textContent = `Stable (${fmt(delta, 1)})`;
-            }
-        }
-        prevValue = latest;
-
-        // ── Phase pill
-        elPhasePill.className = "phase-pill phase-" + currentPhase;
-        elPhasePill.textContent = PHASE_LABELS[currentPhase] || currentPhase;
-
-        // ── Stats
-        const allVals = allCortisol.filter(v => typeof v === "number");
-        elStatPeak.textContent  = allVals.length ? fmt(Math.max(...allVals), 1) : "—";
-        elStatLow.textContent   = allVals.length ? fmt(Math.min(...allVals), 1) : "—";
-        elStatCount.textContent = allTs.length;
-
-        const cutoff1h = now - 3_600_000;
-        const vals1h = allCortisol.filter((_, i) => allTs[i] >= cutoff1h);
-        if (vals1h.length) {
-            const mean = vals1h.reduce((a, b) => a + b, 0) / vals1h.length;
-            elStatMean1h.textContent = fmt(mean, 1);
-        }
-
-        // ── Charts
-        drawHistory();
-        drawSparkline(now);
+    function updateCard(sid,s,v,lv){
+        const card=document.getElementById('card-'+sid);if(!card)return;
+        card.className='pt-card lv-'+lv;
+        const badge=document.getElementById('badge-'+sid);badge.textContent=getLvLabel(lv);badge.className='ptc-badge lv-'+lv;
+        const valEl=document.getElementById('cval-'+sid);valEl.textContent=v.toFixed(1);valEl.className='ptc-value lv-'+lv;
+        const phEl=document.getElementById('cph-'+sid);phEl.textContent=PH_LABELS[s.phase]||s.phase;phEl.className='ptc-phase ph-'+s.phase;
+        const arr=document.getElementById('ctarrow-'+sid);
+        if(s.cortisol.length>=31){const d30=v-s.cortisol[s.cortisol.length-31];if(d30>10){arr.textContent='↑';arr.className='ptc-trend-arrow up';}else if(d30<-10){arr.textContent='↓';arr.className='ptc-trend-arrow down';}else{arr.textContent='→';arr.className='ptc-trend-arrow flat';}}else arr.textContent='';
+        const vals=s.cortisol,now=s.ts[s.ts.length-1];
+        document.getElementById('cpk-'+sid).textContent=Math.max(...vals).toFixed(1);
+        document.getElementById('clo-'+sid).textContent=Math.min(...vals).toFixed(1);
+        const v1h=s.cortisol.filter((_,i)=>s.ts[i]>=now-3600000);
+        document.getElementById('cmn-'+sid).textContent=v1h.length?(v1h.reduce((a,b)=>a+b,0)/v1h.length).toFixed(1):'—';
+        document.getElementById('cts-'+sid).textContent=new Date(now).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const st=getSimTime(s.ts.length);if(st)document.getElementById('csim-'+sid).textContent='Sim '+st.time+' · Day '+st.day;
+        drawCardSpark(sid,s.ts,s.cortisol);
     }
 
-    /* ── History chart  */
-    function drawHistory() {
-        const canvas = histCanvas;
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width  = rect.width  * dpr;
-        canvas.height = rect.height * dpr;
-        const ctx = canvas.getContext("2d");
-        ctx.scale(dpr, dpr);
-        const W = rect.width, H = rect.height;
-
-        const padL = 58, padR = 20, padT = 16, padB = 38;
-        const plotW = W - padL - padR;
-        const plotH = H - padT - padB;
-
-        if (allTs.length < 2) {
-            ctx.fillStyle = COLORS.muted;
-            ctx.font = "13px 'Sora', sans-serif";
-            ctx.fillText("Waiting for data…", padL + 12, padT + plotH / 2);
-            return;
-        }
-
-        // Draw helper text
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = "10px 'Sora', sans-serif";
-        ctx.textAlign = "right";
-        ctx.fillText("🖱️ Scroll to zoom, Drag to pan, Dbl-click to reset", padL + plotW, padT - 6);
-
-        // Apply interactive view bounds
-        const minT = viewMinT, maxT = viewMaxT;
-
-        let minV = Math.min(...allCortisol) - 30;
-        let maxV = Math.max(...allCortisol) + 30;
-        minV = Math.min(minV, THRESHOLDS.low - 20);
-        maxV = Math.max(maxV, THRESHOLDS.veryHigh + 20);
-
-        const xOf = t => padL + ((t - minT) / (maxT - minT || 1)) * plotW;
-        const yOf = v => padT + (1 - (v - minV) / (maxV - minV)) * plotH;
-
-        // ── Background grid
-        ctx.strokeStyle = COLORS.gridLine;
-        ctx.lineWidth = 1;
-        const gridSteps = 5;
-        for (let i = 0; i <= gridSteps; i++) {
-            const v = minV + (maxV - minV) * (i / gridSteps);
-            const y = yOf(v);
-            ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
-        }
-
-        // ── Threshold bands (fill)
-        const yVH = yOf(THRESHOLDS.veryHigh);
-        if (yVH > padT) {
-            ctx.fillStyle = "rgba(220,38,38,0.06)";
-            ctx.fillRect(padL, padT, plotW, yVH - padT);
-        }
-        const yHA = yOf(THRESHOLDS.highAmber);
-        ctx.fillStyle = "rgba(217,119,6,0.06)";
-        ctx.fillRect(padL, yVH, plotW, yHA - yVH);
-
-        const yLA = yOf(THRESHOLDS.lowAmber);
-        ctx.fillStyle = "rgba(37,99,235,0.05)";
-        ctx.fillRect(padL, yLA, plotW, yOf(minV) - yLA);
-
-        function hLine(y, color, label) {
-            ctx.save();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 1.2;
-            ctx.setLineDash([5, 5]);
-            ctx.globalAlpha = 0.75;
-            ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
-            ctx.restore();
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 0.85;
-            ctx.font = "10px 'DM Mono', monospace";
-            ctx.fillText(label, padL + 4, y - 3);
-            ctx.globalAlpha = 1;
-        }
-        hLine(yOf(THRESHOLDS.veryHigh),  COLORS.red,   "700");
-        hLine(yOf(THRESHOLDS.highAmber), COLORS.amber,  "550");
-        hLine(yOf(THRESHOLDS.lowAmber),  COLORS.blue,   "150");
-
-        // ── ADD CLIPPING REGION ──
-        // This prevents the zoomed graph from drawing over the Y-axis numbers
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(padL, padT, plotW, plotH);
-        ctx.clip();
-
-        // ── Area fill under curve
-        ctx.beginPath();
-        ctx.moveTo(xOf(allTs[0]), yOf(allCortisol[0]));
-        for (let i = 1; i < allTs.length; i++) {
-            ctx.lineTo(xOf(allTs[i]), yOf(allCortisol[i]));
-        }
-        ctx.lineTo(xOf(allTs[allTs.length - 1]), yOf(minV));
-        ctx.lineTo(xOf(allTs[0]), yOf(minV));
-        ctx.closePath();
-        const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
-        grad.addColorStop(0,   "rgba(13,148,136,0.22)");
-        grad.addColorStop(0.7, "rgba(13,148,136,0.04)");
-        grad.addColorStop(1,   "rgba(13,148,136,0)");
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // ── Cortisol line
-        ctx.beginPath();
-        ctx.moveTo(xOf(allTs[0]), yOf(allCortisol[0]));
-        for (let i = 1; i < allTs.length; i++) {
-            ctx.lineTo(xOf(allTs[i]), yOf(allCortisol[i]));
-        }
-        ctx.strokeStyle = COLORS.teal;
-        ctx.lineWidth = 2;
-        ctx.lineJoin = "round";
-        ctx.stroke();
-
-        // ── Latest value dot
-        const lx = xOf(allTs[allTs.length - 1]);
-        const ly = yOf(allCortisol[allCortisol.length - 1]);
-        ctx.beginPath();
-        ctx.arc(lx, ly, 5, 0, Math.PI * 2);
-        ctx.fillStyle = COLORS.teal;
-        ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.restore(); // ── END CLIPPING REGION ──
-
-        // ── Axes
-        ctx.strokeStyle = COLORS.border;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH);
-        ctx.lineTo(padL + plotW, padT + plotH);
-        ctx.stroke();
-
-        // ── Y-axis labels
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = "10px 'DM Mono', monospace";
-        ctx.textAlign = "right";
-        for (let i = 0; i <= gridSteps; i++) {
-            const v = minV + (maxV - minV) * (i / gridSteps);
-            ctx.fillText(fmt(v, 0), padL - 6, yOf(v) + 4);
-        }
-
-        // ── X-axis labels
-        ctx.textAlign = "left";
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = "10px 'DM Mono', monospace";
-        const xLabels = 5;
-        for (let i = 0; i <= xLabels; i++) {
-            const t = minT + (maxT - minT) * (i / xLabels);
-            const x = xOf(t);
-            const label = fmtTime(t);
-            if (i === xLabels) {
-                ctx.textAlign = "right";
-                ctx.fillText(label, x, padT + plotH + 22);
-                ctx.textAlign = "left";
-            } else {
-                ctx.fillText(label, x, padT + plotH + 22);
-            }
-        }
+    function drawCardSpark(sid,ts,cortisol){
+        const canvas=document.getElementById('csp-'+sid);if(!canvas||ts.length<2)return;
+        const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||280,H=56;
+        canvas.width=W*dpr;canvas.height=H*dpr;
+        const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const n=Math.min(ts.length,120),sTs=ts.slice(-n),sC=cortisol.slice(-n);
+        const minV=Math.min(...sC)-8,maxV=Math.max(...sC)+8,minT=sTs[0],maxT=Math.max(sTs[sTs.length-1],minT+1);
+        const xOf=t=>((t-minT)/(maxT-minT))*W,yOf=v=>H-((v-minV)/(maxV-minV))*(H-4)-2;
+        ctx.beginPath();ctx.moveTo(xOf(sTs[0]),yOf(sC[0]));for(let i=1;i<sTs.length;i++)ctx.lineTo(xOf(sTs[i]),yOf(sC[i]));
+        ctx.lineTo(xOf(sTs[sTs.length-1]),H+2);ctx.lineTo(-2,H+2);ctx.closePath();
+        const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(21,101,192,0.16)');g.addColorStop(1,'rgba(21,101,192,0)');ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.moveTo(xOf(sTs[0]),yOf(sC[0]));for(let i=1;i<sTs.length;i++)ctx.lineTo(xOf(sTs[i]),yOf(sC[i]));
+        ctx.strokeStyle='#1565c0';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.stroke();
     }
 
-    /* ── Sparkline  */
-    function drawSparkline(nowMs) {
-        const canvas = sparkCanvas;
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width  = rect.width  * dpr;
-        canvas.height = rect.height * dpr;
-        const ctx = canvas.getContext("2d");
-        ctx.scale(dpr, dpr);
-        const W = rect.width, H = rect.height;
-
-        const cutoff = nowMs - TWO_HOURS_MS;
-        const ts  = allTs.filter((t, i) => t >= cutoff);
-        const cor = allCortisol.filter((_, i) => allTs[i] >= cutoff);
-
-        if (ts.length < 2) {
-            ctx.fillStyle = COLORS.muted;
-            ctx.font = "11px 'Sora', sans-serif";
-            ctx.fillText("Building 2-hour history…", 0, H / 2 + 4);
-            elSparkSub.textContent = "Not enough data yet";
-            return;
-        }
-
-        const minV = Math.min(...cor) - 10;
-        const maxV = Math.max(...cor) + 10;
-        const minT = ts[0], maxT = ts[ts.length - 1];
-
-        const xOf = t => ((t - minT) / (maxT - minT || 1)) * W;
-        const yOf = v => H - 4 - ((v - minV) / (maxV - minV || 1)) * (H - 8);
-
-        // Area
-        ctx.beginPath();
-        ctx.moveTo(xOf(ts[0]), yOf(cor[0]));
-        for (let i = 1; i < ts.length; i++) ctx.lineTo(xOf(ts[i]), yOf(cor[i]));
-        ctx.lineTo(xOf(ts[ts.length-1]), H);
-        ctx.lineTo(xOf(ts[0]), H);
-        ctx.closePath();
-        const g2 = ctx.createLinearGradient(0, 0, 0, H);
-        g2.addColorStop(0, "rgba(13,148,136,0.18)");
-        g2.addColorStop(1, "rgba(13,148,136,0)");
-        ctx.fillStyle = g2; ctx.fill();
-
-        // Line
-        ctx.beginPath();
-        ctx.moveTo(xOf(ts[0]), yOf(cor[0]));
-        for (let i = 1; i < ts.length; i++) ctx.lineTo(xOf(ts[i]), yOf(cor[i]));
-        ctx.strokeStyle = COLORS.teal;
-        ctx.lineWidth = 1.8;
-        ctx.lineJoin = "round";
-        ctx.stroke();
-
-        const delta2h = cor[cor.length - 1] - cor[0];
-        elSparkSub.textContent = `${ts.length} readings · ${delta2h >= 0 ? "+" : ""}${fmt(delta2h, 1)} nmol/L vs 2h ago`;
+    function drawCircadianTimeline(simSecs){
+        const canvas=document.getElementById('circadian-canvas');if(!canvas)return;
+        const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||246,H=40;
+        canvas.width=W*dpr;canvas.height=H*dpr;const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const DAY=86400,xOf=s=>(s/DAY)*W;
+        ctx.fillStyle='#e2e8f0';ctx.beginPath();ctx.roundRect(0,12,W,12,4);ctx.fill();
+        [[0,21600,'#0f172a'],[21600,25200,'#7c2d12'],[25200,36000,'#b45309'],[36000,50400,'#1565c0'],[50400,52200,'#b91c1c'],[52200,68400,'#1565c0'],[68400,79200,'#334155'],[79200,86400,'#0f172a']].forEach(([s,e,col])=>{ctx.fillStyle=col;ctx.fillRect(xOf(s),12,Math.max(1,xOf(e)-xOf(s)),12);});
+        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.roundRect(0,12,6,12,[4,0,0,4]);ctx.fill();ctx.beginPath();ctx.roundRect(W-6,12,6,12,[0,4,4,0]);ctx.fill();
+        const nx=Math.min(Math.max(xOf(simSecs%DAY),5),W-5);
+        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.moveTo(nx,25);ctx.lineTo(nx-4.5,34);ctx.lineTo(nx+4.5,34);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#ffffff';ctx.font='bold 6px "Sora",sans-serif';ctx.textAlign='center';ctx.fillText('NOW',Math.min(Math.max(nx,16),W-16),10);
+        ctx.fillStyle='#94a3b8';ctx.font='7px "DM Mono",monospace';[[0,'00'],[21600,'06'],[43200,'12'],[64800,'18'],[86400,'24']].forEach(([s,l])=>{ctx.textAlign=s===0?'left':s===86400?'right':'center';ctx.fillText(l+':00',xOf(s),40);});
     }
 
-    /* ── Event Listeners for Zoom & Pan ── */
-
-    // Mouse Wheel to Zoom
-    histCanvas.addEventListener('wheel', (e) => {
-        e.preventDefault(); // Prevent page scrolling
-        if (allTs.length < 2) return;
-        customView = true;
-
-        const rect = histCanvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const padL = 58;
-        const plotW = rect.width - padL - 20;
-
-        // Find time exactly where mouse is hovering
-        const mouseRatio = Math.max(0, Math.min(1, (mouseX - padL) / plotW));
-        const timeAtMouse = viewMinT + mouseRatio * (viewMaxT - viewMinT);
-
-        // Calculate zoom logic
-        const zoomSpeed = 0.15;
-        const zoomDelta = e.deltaY > 0 ? (1 + zoomSpeed) : (1 - zoomSpeed);
-        const currentRange = viewMaxT - viewMinT;
-        const newRange = currentRange * zoomDelta;
-
-        viewMinT = timeAtMouse - (mouseRatio * newRange);
-        viewMaxT = timeAtMouse + ((1 - mouseRatio) * newRange);
-
-        // Prevent zooming out way past the data
-        const dataMin = allTs[0];
-        const dataMax = allTs[allTs.length - 1];
-        if (viewMinT < dataMin - 3600000) viewMinT = dataMin - 3600000;
-        if (viewMaxT > dataMax + 3600000) viewMaxT = dataMax + 3600000;
-
-        drawHistory();
-    });
-
-    // Click & Drag to Pan
-    let isDragging = false;
-    let lastMouseX = 0;
-
-    histCanvas.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        lastMouseX = e.clientX;
-        histCanvas.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mouseup', () => {
-        isDragging = false;
-        histCanvas.style.cursor = 'grab';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging || allTs.length < 2) return;
-        customView = true;
-
-        const rect = histCanvas.getBoundingClientRect();
-        const plotW = rect.width - 58 - 20;
-        const deltaX = e.clientX - lastMouseX;
-        lastMouseX = e.clientX;
-
-        // Convert pixel drag to time shift
-        const timePerPixel = (viewMaxT - viewMinT) / plotW;
-        const timeDelta = deltaX * timePerPixel;
-
-        viewMinT -= timeDelta;
-        viewMaxT -= timeDelta;
-
-        drawHistory();
-    });
-
-    // Double-click to reset view
-    histCanvas.addEventListener('dblclick', () => {
-        customView = false;
-        render();
-    });
-
-    /* ── Helpers  */
-    function fmt(v, digits = 1) {
-        if (!Number.isFinite(v)) return "—";
-        return v.toFixed(digits);
+    async function fetchDet(){
+        if(!curSubject)return;
+        try{
+            const r=await fetch(`/telemetry?subject=${curSubject}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();
+            const iTs=Array.isArray(d.ts)?d.ts:[],iC=Array.isArray(d.cortisol)?d.cortisol:[];
+            for(let i=0;i<Math.min(iTs.length,iC.length);i++){if(typeof iTs[i]!=='number'||typeof iC[i]!=='number')continue;if(!detTs.length||iTs[i]>detTs[detTs.length-1]){detTs.push(iTs[i]);detC.push(iC[i]);}}
+            if(typeof d.phase==='string')detPhase=d.phase;renderDet();
+            document.getElementById('hdr-status').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }catch(e){}
     }
 
-    function fmtTime(ms) {
-        if (!Number.isFinite(ms)) return "—";
-        return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    function renderDet(){
+        if(!detTs.length)return;
+        const latest=detC[detC.length-1],now=detTs[detTs.length-1];
+        if(!zoomCustom){vMinT=detTs[0];vMaxT=detTs[detTs.length-1];if(vMaxT<=vMinT+5000)vMaxT=vMinT+120000;}
+        document.getElementById('d-cur').textContent=latest.toFixed(1);document.getElementById('d-val').className='d-val lv-'+getLevel(latest);
+        if(detPrev!==null){const delta=latest-detPrev;const arr=document.getElementById('d-arr'),txt=document.getElementById('d-trend-txt');if(delta>5){arr.textContent='↑';arr.className='d-arr up';txt.textContent=`+${delta.toFixed(1)} from last reading`;}else if(delta<-5){arr.textContent='↓';arr.className='d-arr down';txt.textContent=`${delta.toFixed(1)} from last reading`;}else{arr.textContent='→';arr.className='d-arr flat';txt.textContent=`Stable (${delta.toFixed(1)})`;}}
+        detPrev=latest;
+        const pill=document.getElementById('d-phase');pill.className='d-phase-pill ph-'+detPhase;pill.textContent=PH_LABELS[detPhase]||detPhase;
+        document.getElementById('d-peak').textContent=Math.max(...detC).toFixed(1);document.getElementById('d-low').textContent=Math.min(...detC).toFixed(1);document.getElementById('d-count').textContent=detTs.length;
+        const v1h=detC.filter((_,i)=>detTs[i]>=now-3600000);document.getElementById('d-mean').textContent=v1h.length?(v1h.reduce((a,b)=>a+b,0)/v1h.length).toFixed(1):'—';
+        const rocEl=document.getElementById('d-roc');
+        if(detC.length>=60){const roc=detC[detC.length-1]-detC[detC.length-61];rocEl.textContent=(roc>=0?'+':'')+roc.toFixed(1);rocEl.className='d-stat-val '+(roc>20?'roc-up':roc<-20?'roc-down':'roc-flat');}else{rocEl.textContent='—';rocEl.className='d-stat-val';}
+        const st=getSimTime(detTs.length);
+        if(st){document.getElementById('d-simtime').textContent='Sim '+st.time+' · Day '+st.day;document.getElementById('d-simday').textContent=st.day;updateSimDisplay(detTs.length);drawCircadianTimeline(st.secs);}
+        drawDetHistory();drawDetSpark(now);
     }
 
-    function levelClass(v) {
-        if (v >= THRESHOLDS.veryHigh)  return "level-very-high";
-        if (v >= THRESHOLDS.highAmber) return "level-high";
-        if (v <  THRESHOLDS.lowAmber)  return "level-low";
-        return "";
+    function drawDetHistory(){
+        const canvas=document.getElementById('history-canvas');
+        const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+        const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const W=rect.width,H=rect.height,pL=56,pR=16,pT=14,pB=36,pW=W-pL-pR,pH=H-pT-pB;
+        if(detTs.length<2||vMaxT<=vMinT){ctx.fillStyle=C.muted;ctx.font="13px 'Sora',sans-serif";ctx.textAlign='left';ctx.fillText("Loading data…",pL+12,pT+pH/2);return;}
+        let minV=Math.min(...detC)-30,maxV=Math.max(...detC)+30;minV=Math.min(minV,THR.low-20);maxV=Math.max(maxV,THR.veryHigh+20);
+        const rng=vMaxT-vMinT,xOf=t=>pL+((t-vMinT)/rng)*pW,yOf=v=>pT+(1-(v-minV)/(maxV-minV))*pH;
+        ctx.strokeStyle=C.grid;ctx.lineWidth=1;for(let i=0;i<=5;i++){const y=yOf(minV+(maxV-minV)*(i/5));ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+pW,y);ctx.stroke();}
+        const yVH=yOf(THR.veryHigh),yHA=yOf(THR.highAmber),yLA=yOf(THR.lowAmber);
+        ctx.fillStyle='rgba(185,28,28,0.04)';ctx.fillRect(pL,pT,pW,Math.max(0,yVH-pT));
+        ctx.fillStyle='rgba(180,83,9,0.04)';ctx.fillRect(pL,yVH,pW,yHA-yVH);
+        ctx.fillStyle='rgba(29,78,216,0.04)';ctx.fillRect(pL,yLA,pW,yOf(minV)-yLA);
+        const hLine=(y,col,lbl)=>{ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.globalAlpha=0.65;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+pW,y);ctx.stroke();ctx.restore();ctx.fillStyle=col;ctx.globalAlpha=0.75;ctx.font="9px 'DM Mono',monospace";ctx.textAlign='left';ctx.fillText(lbl,pL+3,y-3);ctx.globalAlpha=1;};
+        hLine(yOf(THR.veryHigh),C.red,'700');hLine(yOf(THR.highAmber),C.amber,'550');hLine(yOf(THR.lowAmber),C.low,'150');
+        ctx.save();ctx.beginPath();ctx.rect(pL,pT,pW,pH);ctx.clip();
+        ctx.beginPath();ctx.moveTo(xOf(detTs[0]),yOf(detC[0]));for(let i=1;i<detTs.length;i++)ctx.lineTo(xOf(detTs[i]),yOf(detC[i]));
+        ctx.lineTo(xOf(detTs[detTs.length-1]),yOf(minV));ctx.lineTo(xOf(detTs[0]),yOf(minV));ctx.closePath();
+        const g=ctx.createLinearGradient(0,pT,0,pT+pH);g.addColorStop(0,'rgba(21,101,192,0.18)');g.addColorStop(0.6,'rgba(21,101,192,0.05)');g.addColorStop(1,'rgba(21,101,192,0)');ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.moveTo(xOf(detTs[0]),yOf(detC[0]));for(let i=1;i<detTs.length;i++)ctx.lineTo(xOf(detTs[i]),yOf(detC[i]));
+        ctx.strokeStyle=C.blue;ctx.lineWidth=1.8;ctx.lineJoin='round';ctx.stroke();
+        const lx=xOf(detTs[detTs.length-1]),ly=yOf(detC[detC.length-1]);
+        ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fillStyle=C.blue;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+        ctx.restore();
+        ctx.strokeStyle=C.border;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pL,pT);ctx.lineTo(pL,pT+pH);ctx.lineTo(pL+pW,pT+pH);ctx.stroke();
+        ctx.fillStyle=C.muted;ctx.font="10px 'DM Mono',monospace";ctx.textAlign='right';for(let i=0;i<=5;i++){const v=minV+(maxV-minV)*(i/5);ctx.fillText(v.toFixed(0),pL-6,yOf(v)+3);}
+        ctx.fillStyle=C.muted;ctx.font="10px 'DM Mono',monospace";
+        for(let i=0;i<=5;i++){const t=vMinT+rng*(i/5),x=xOf(t),lbl=new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});ctx.textAlign=i===5?'right':i===0?'left':'center';ctx.fillText(lbl,x,pT+pH+20);}
     }
 
-    /* ── Resize handler */
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => { if (allTs.length) render(); }, 120);
-    });
+    function drawDetSpark(nowMs){
+        const canvas=document.getElementById('spark-canvas');
+        const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+        const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const W=rect.width,H=rect.height;
+        const ts=detTs.filter(t=>t>=nowMs-TWO_H),cor=detC.filter((_,i)=>detTs[i]>=nowMs-TWO_H);
+        if(ts.length<2){ctx.fillStyle=C.muted;ctx.font="11px 'Sora',sans-serif";ctx.textAlign='left';ctx.fillText("Building 2-hour history…",0,H/2+4);document.getElementById('d-spark-sub').textContent='Not enough data yet';return;}
+        const minV=Math.min(...cor)-10,maxV=Math.max(...cor)+10,minT=ts[0],maxT=Math.max(ts[ts.length-1],minT+1);
+        const xOf=t=>((t-minT)/(maxT-minT))*W,yOf=v=>H-2-((v-minV)/(maxV-minV))*(H-4);
+        ctx.beginPath();ctx.moveTo(xOf(ts[0]),yOf(cor[0]));for(let i=1;i<ts.length;i++)ctx.lineTo(xOf(ts[i]),yOf(cor[i]));ctx.lineTo(xOf(ts[ts.length-1]),H);ctx.lineTo(0,H);ctx.closePath();
+        const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(21,101,192,0.16)');g.addColorStop(1,'rgba(21,101,192,0)');ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.moveTo(xOf(ts[0]),yOf(cor[0]));for(let i=1;i<ts.length;i++)ctx.lineTo(xOf(ts[i]),yOf(cor[i]));
+        ctx.strokeStyle=C.blue;ctx.lineWidth=1.8;ctx.lineJoin='round';ctx.stroke();
+        const delta=cor[cor.length-1]-cor[0];document.getElementById('d-spark-sub').textContent=`${ts.length} readings · ${delta>=0?'+':''}${delta.toFixed(1)} nmol/L vs 2h ago`;
+    }
 
-    /* ── Boot */
-    fetchAndRender();
-    setInterval(fetchAndRender, POLL_MS);
+    const histCanvas=document.getElementById('history-canvas');
+    histCanvas.addEventListener('wheel',e=>{
+        e.preventDefault();if(detTs.length<2)return;zoomCustom=true;
+        const rect=histCanvas.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(e.clientX-rect.left-56)/(rect.width-72)));
+        const tAt=vMinT+ratio*(vMaxT-vMinT),range=(vMaxT-vMinT)*(e.deltaY>0?1.15:0.87);
+        vMinT=tAt-ratio*range;vMaxT=tAt+(1-ratio)*range;
+        if(vMaxT-vMinT<10000)vMaxT=vMinT+10000;
+        vMinT=Math.max(vMinT,detTs[0]-3600000);vMaxT=Math.min(vMaxT,detTs[detTs.length-1]+3600000);
+        drawDetHistory();
+    },{passive:false});
+    histCanvas.addEventListener('mousedown',e=>{dragging=true;lastMX=e.clientX;histCanvas.style.cursor='grabbing';});
+    window.addEventListener('mouseup',()=>{dragging=false;histCanvas.style.cursor='grab';});
+    window.addEventListener('mousemove',e=>{if(!dragging||detTs.length<2)return;zoomCustom=true;const rect=histCanvas.getBoundingClientRect(),tpp=(vMaxT-vMinT)/(rect.width-72),shift=(e.clientX-lastMX)*tpp;vMinT-=shift;vMaxT-=shift;lastMX=e.clientX;drawDetHistory();});
+    histCanvas.addEventListener('dblclick',()=>{zoomCustom=false;renderDet();});
+
+    let rszTmr;
+    window.addEventListener('resize',()=>{clearTimeout(rszTmr);rszTmr=setTimeout(()=>{if(document.getElementById('view-detail').style.display!=='none')drawDetHistory();else for(const sid of SUBJECTS){const s=ovStore[sid];if(s&&s.ts.length)drawCardSpark(sid,s.ts,s.cortisol);}},120);});
+
+    buildCards();showOverview();
 </script>
-
 </body>
 </html>
