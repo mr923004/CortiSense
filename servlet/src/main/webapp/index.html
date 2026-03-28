@@ -108,7 +108,12 @@
         .view-anim{animation:viewIn 0.22s ease-out;}
 
         /* ── OVERVIEW ── */
-        #view-overview{max-width:1340px;margin:0 auto;padding:26px 22px 64px;}
+        #view-overview, #view-detail {
+            max-width: 1340px;
+            width: 100%;
+            margin: auto;
+            padding: 40px 22px;
+        }
         .ov-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
         .ov-title{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;}
         .ov-title-sub{font-size:12px;font-weight:400;color:var(--muted);margin-left:10px;}
@@ -172,7 +177,6 @@
         .ptc-view-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
 
         /* ── DETAIL VIEW ── */
-        #view-detail{max-width:1340px;margin:0 auto;padding:22px 22px 64px;}
         .det-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
         .back-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r8);padding:6px 14px;cursor:pointer;transition:all 0.15s;}
         .back-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
@@ -233,7 +237,19 @@
         .pill-sm.amber{background:var(--amber-bg);color:var(--amber); border:1px solid var(--amber-bd);}
         .pill-sm.red  {background:var(--red-bg);  color:var(--red);  border:1px solid var(--red-bd);}
         .pill-sm.info {background:var(--low-bg);  color:var(--low);  border:1px solid var(--low-bd);}
-        footer{text-align:center;padding:20px 24px;font-size:10px;color:var(--muted);letter-spacing:0.2px;border-top:1px solid var(--border);}
+        /* ── APP WRAPPER ── */
+        #app-container {
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        footer{
+            margin-top:auto;
+            text-align:center;
+            padding:20px 24px;
+            font-size:10px;
+            color:var(--muted);
+            letter-spacing:0.2px;
+            border-top:1px solid var(--border);}
         footer strong{color:var(--ink2);}
         @media(max-width:840px){
             .det-grid{grid-template-columns:1fr;}
@@ -260,6 +276,12 @@
             text-align: center;
             border: 1px solid var(--border);
             animation: viewIn 0.4s ease-out;
+        }
+        .login-logo {
+            max-width: 320px;
+            height: auto;
+            margin: 0 auto 24px auto;
+            display: block;
         }
         .login-title { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.5px;}
         .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
@@ -291,6 +313,17 @@
         }
         .login-btn:hover { background: var(--navy-2); transform: translateY(-1px); box-shadow: var(--sh-sm); }
         .login-err { color: var(--red); font-size: 12px; font-weight: 600; margin-top: 16px; display: none; }
+
+        /* ── PATIENT MODE SCALING ── */
+        #view-detail.patient-mode {
+            max-width: 1050px;
+            margin: auto;
+        }
+        #view-detail.patient-mode .det-nav {
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 24px;
+        }
         .patient-mode .hero-card {
             grid-row: 1 / 3;
             display: flex;
@@ -305,12 +338,11 @@
 <body>
 <div id="view-login">
     <div class="login-card">
+        <img src="/logo.png" alt="CortiSense Logo" class="login-logo" onerror="this.style.display='none'" />
         <div class="login-title">CortiSense Secure</div>
         <div class="login-sub">Clinical Portal Access</div>
-
         <input type="text" id="login-user" class="login-input" placeholder="Username" />
         <input type="password" id="login-pass" class="login-input" placeholder="Password" />
-
         <button class="login-btn" onclick="attemptLogin()">Sign In</button>
         <div id="login-err" class="login-err">Invalid username or password.</div>
     </div>
@@ -514,11 +546,11 @@
     }
     function showDetail(sid){
         const isDoc = (currentUserRole === 'doctor');
-        const grid = document.querySelector('.det-grid');
+        const viewDetail = document.getElementById('view-detail');
         if (isDoc) {
-            grid.classList.remove('patient-mode');
+            viewDetail.classList.remove('patient-mode');
         } else {
-            grid.classList.add('patient-mode');
+            viewDetail.classList.add('patient-mode');
         }
         document.getElementById('btn-back-overview').style.display = isDoc ? 'flex' : 'none';
         document.getElementById('card-session-stats').style.display = isDoc ? 'flex' : 'none';
@@ -732,7 +764,7 @@
         if (account && account.pass === pass) {
             // Valid login! Hide login screen, show app
             document.getElementById('view-login').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('app-container').style.display = 'flex';
             document.getElementById('login-err').style.display = 'none';
 
             currentUserRole = account.role;
