@@ -345,6 +345,10 @@
                     <div class="doc-role">DAPP Proof of Concept</div>
                 </div>
             </div>
+            <div class="hdr-div"></div>
+            <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); border-radius:6px; padding:6px 12px; font-family:'Sora',sans-serif; font-size:10px; font-weight:700; cursor:pointer; transition: 0.2s;">
+                Log Out
+            </button>
         </div>
     </div>
 </header>
@@ -415,14 +419,14 @@
                 <div class="d-stat"><div class="d-stat-lbl">Sim Day</div><div class="d-stat-val" id="d-simday">—</div><div class="d-stat-sub">of monitoring</div></div>
             </div>
         </div>
-        <div class="d-card spark-card">
+        <div id="card-spark" class="d-card spark-card">
             <div style="display:flex;justify-content:space-between;align-items:baseline;">
                 <div class="d-card-title" style="margin-bottom:0;">2-Hour Trend</div>
                 <div style="font-size:10px;color:var(--muted);" id="d-spark-sub">—</div>
             </div>
             <canvas id="spark-canvas"></canvas>
         </div>
-        <div class="d-card ref-card">
+        <div id="card-ref" class="d-card ref-card">
             <div class="d-card-title">Reference Ranges</div>
             <table class="ref-table">
                 <thead><tr><th>Phase / Threshold</th><th>Range (nmol/L)</th><th>Status</th></tr></thead>
@@ -500,11 +504,21 @@
         fetchAllOv();ovTimer=setInterval(fetchAllOv,POLL_MS);
     }
     function showDetail(sid){
+        const isDoc = (currentUserRole === 'doctor');
+        document.getElementById('btn-back-overview').style.display = (currentUserRole === 'doctor') ? 'flex' : 'none';
+        document.getElementById('card-session-stats').style.display = (currentUserRole === 'doctor') ? 'block' : 'none';
+        document.getElementById('card-spark').style.display = isDoc ? 'block' : 'none';
+        document.getElementById('card-ref').style.display = isDoc ? 'block' : 'none';
+        document.getElementById('view-overview').style.display='none';
+        document.getElementById('view-detail').style.display='';
+        animView('view-detail');
+        clearInterval(ovTimer);ovTimer=null;
         document.getElementById('view-overview').style.display='none';document.getElementById('view-detail').style.display='';
         animView('view-detail');clearInterval(ovTimer);ovTimer=null;
         curSubject=sid;detTs=[];detC=[];detPhase='baseline';detPrev=null;zoomCustom=false;
         document.getElementById('det-name').textContent=PT_LABELS[sid]||sid;
         fetchDet();detTimer=setInterval(fetchDet,POLL_MS);
+        document.getElementById('view-overview').style.display='none';
     }
 
     function buildCards(){
@@ -680,28 +694,77 @@
     let rszTmr;
     window.addEventListener('resize',()=>{clearTimeout(rszTmr);rszTmr=setTimeout(()=>{if(document.getElementById('view-detail').style.display!=='none')drawDetHistory();else for(const sid of SUBJECTS){const s=ovStore[sid];if(s&&s.ts.length)drawCardSpark(sid,s.ts,s.cortisol);}},120);});
 
+    // Define users, passwords, and roles
+    const CREDENTIALS = {
+        'dr_smith': { pass: 'doctor123', role: 'doctor' },
+        'patient1': { pass: 'pass1', role: 'patient', subjectId: 'user-1' },
+        'patient2': { pass: 'pass2', role: 'patient', subjectId: 'user-2' },
+        'patient3': { pass: 'pass3', role: 'patient', subjectId: 'user-3' },
+        'patient4': { pass: 'pass4', role: 'patient', subjectId: 'user-4' },
+        'patient5': { pass: 'pass5', role: 'patient', subjectId: 'user-5' },
+        'patient6': { pass: 'pass6', role: 'patient', subjectId: 'user-6' }
+    };
+
+    // Track who is logged in
+    let currentUserRole = null;
+
     function attemptLogin() {
         const user = document.getElementById('login-user').value;
         const pass = document.getElementById('login-pass').value;
 
-        // Hardcoded PoC credentials
-        if (user === 'admin' && pass === 'password') {
-            // Hide login, show app
+        const account = CREDENTIALS[user];
+
+        if (account && account.pass === pass) {
+            // Valid login! Hide login screen, show app
             document.getElementById('view-login').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
+            document.getElementById('login-err').style.display = 'none';
 
-            buildCards();
-            showOverview();
+            currentUserRole = account.role;
+
+            if (account.role === 'doctor') {
+                // DOCTOR SETUP: Show everything, go to overview
+                document.getElementById('btn-back-overview').style.display = 'flex';
+                document.getElementById('card-session-stats').style.display = 'block';
+                buildCards();
+                showOverview();
+            }
+            else if (account.role === 'patient') {
+                // PATIENT SETUP: Hide overview button & stats, go straight to their specific record
+                document.getElementById('btn-back-overview').style.display = 'none';
+                document.getElementById('card-session-stats').style.display = 'none';
+
+                // Change the top right "Doctor" profile to say "Patient"
+                document.querySelector('.doc-avatar').textContent = "Pt";
+                document.querySelector('.doc-name').textContent = "Patient View";
+                document.querySelector('.doc-role').textContent = "Self-Monitoring";
+
+                showDetail(account.subjectId);
+            }
         } else {
-            // Show error message
+            // Invalid credentials
             document.getElementById('login-err').style.display = 'block';
         }
     }
 
-    // Allow pressing "Enter" on the password field to log in
-    document.getElementById('login-pass').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') attemptLogin();
-    });
+    function logout() {
+        // Clear the user role
+        currentUserRole = null;
+
+        // Stop fetching data in the background
+        clearInterval(ovTimer); ovTimer = null;
+        clearInterval(detTimer); detTimer = null;
+
+        // Clear the password field for security
+        document.getElementById('login-pass').value = '';
+
+        // Hide the app and show the login screen
+        document.getElementById('app-container').style.display = 'none';
+        document.getElementById('view-overview').style.display = 'none';
+        document.getElementById('view-detail').style.display = 'none';
+        document.getElementById('view-login').style.display = 'flex';
+        document.getElementById('login-err').style.display = 'none';
+    }
 </script>
 </div>
 </body>
