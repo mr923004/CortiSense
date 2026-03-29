@@ -9,91 +9,64 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
     <style>
         :root {
-            --navy:     #060e24;
-            --navy-2:   #0d1d4a;
-            --blue:     #1565c0;
-            --blue-mid: #1976d2;
-            --sky:      #60b4e8;
-            --blue-50:  #e3f2fd;
-            --blue-100: #bbdefb;
-            --ok:       #15803d;  --ok-bg:   rgba(21,128,61,0.09);  --ok-bd:   rgba(21,128,61,0.25);
-            --amber:    #b45309;  --amber-bg:rgba(180,83,9,0.09);   --amber-bd:rgba(180,83,9,0.25);
-            --red:      #b91c1c;  --red-bg:  rgba(185,28,28,0.09);  --red-bd:  rgba(185,28,28,0.25);
-            --low:      #1d4ed8;  --low-bg:  rgba(29,78,216,0.08);  --low-bd:  rgba(29,78,216,0.22);
-            --ink:      #0f172a;  --ink2:    #1e293b;  --ink3:  #475569;
-            --muted:    #94a3b8;  --border:  rgba(15,23,42,0.07);
-            --card:     #ffffff;  --bg:      #eef2f9;
+            --navy:     #060e24;  --navy-2:   #0d1d4a;
+            --blue:     #1565c0;  --blue-mid: #1976d2;
+            --sky:      #60b4e8;  --blue-50:  #e3f2fd;  --blue-100: #bbdefb;
+            --ok:       #15803d;  --ok-bg:    rgba(21,128,61,0.09);   --ok-bd:    rgba(21,128,61,0.25);
+            --amber:    #b45309;  --amber-bg: rgba(180,83,9,0.09);    --amber-bd: rgba(180,83,9,0.25);
+            --red:      #b91c1c;  --red-bg:   rgba(185,28,28,0.09);   --red-bd:   rgba(185,28,28,0.25);
+            --low:      #1d4ed8;  --low-bg:   rgba(29,78,216,0.08);   --low-bd:   rgba(29,78,216,0.22);
+            --ink:      #0f172a;  --ink2:     #1e293b;  --ink3:     #475569;
+            --muted:    #94a3b8;  --border:   rgba(15,23,42,0.07);
+            --card:     #ffffff;  --bg:       #eef2f9;
             --sh-sm: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
             --sh-md: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.08);
             --sh-blue: 0 4px 20px rgba(21,101,192,0.18), 0 1px 4px rgba(0,0,0,0.04);
-            --r8:8px; --r12:12px; --r16:16px; --r20:20px;
+            --r8:8px; --r12:12px; --r16:16px; --r20:20px; --r24:24px;
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
+        /* ── LOGIN (unchanged) ── */
+        #view-login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(125deg,var(--navy) 45%,var(--blue-mid) 100%);position:fixed;inset:0;z-index:999;}
+        .login-card{background:var(--blue-50);padding:50px;border-radius:var(--r20);box-shadow:0 20px 40px rgba(0,0,0,0.6);width:100%;max-width:560px;text-align:center;border:1px solid var(--blue-100);animation:viewIn 0.4s ease-out;}
+        .login-logo{max-width:500px;height:auto;margin:0 auto 24px auto;display:block;}
+        .login-title{font-size:30px;font-weight:800;color:var(--navy);margin-bottom:6px;letter-spacing:-0.5px;}
+        .login-sub{font-size:15px;color:var(--muted);margin-bottom:28px;}
+        .login-input{width:100%;padding:14px 16px;margin-bottom:16px;border:1px solid var(--border);border-radius:var(--r8);font-family:'Sora',sans-serif;font-size:17px;background:#f8fafc;transition:border-color 0.2s;}
+        .login-input:focus{outline:none;border-color:var(--blue);background:#fff;}
+        .login-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r8);font-family:'Sora',sans-serif;font-weight:700;font-size:17px;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+        .login-btn:hover{background:var(--navy-2);transform:translateY(-1px);box-shadow:var(--sh-sm);}
+        .login-err{color:var(--red);font-size:12px;font-weight:600;margin-top:16px;display:none;}
+
+        /* ── TRANSITIONS ── */
+        @keyframes viewIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+        .view-anim{animation:viewIn 0.22s ease-out;}
+
         /* ── HEADER ── */
-        .site-header{
-            height:80px;
-            display:flex;align-items:stretch;
-            position:sticky;top:0;z-index:100;
-            background:linear-gradient(105deg,var(--navy) 0%,var(--navy-2) 100%);
-            box-shadow:0 1px 0 rgba(255,255,255,0.04),0 4px 24px rgba(0,0,0,0.45);
-        }
-
-        /*
-          The logo section renders the image at 290px wide (height: auto → ~193px tall).
-          overflow:hidden clips it to the 80px header height, revealing the vertical centre.
-          mix-blend-mode:lighten makes the black background transparent against the dark header.
-        */
-        .hdr-logo-section{
-            width:300px;
-            height:80px;
-            flex-shrink:0;
-            overflow:hidden;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            border-right:1px solid rgba(255,255,255,0.07);
-            background:rgba(0,0,0,0.12);
-        }
-        .hdr-logo{
-            width:290px;
-            height:auto; /* ~193px tall — clips to header height via overflow:hidden above */
-            mix-blend-mode:lighten;
-            display:block;
-            flex-shrink:0;
-        }
-
-        .hdr-content{
-            flex:1;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 20px 0 22px;
-        }
+        .site-header{height:80px;display:flex;align-items:stretch;position:sticky;top:0;z-index:100;background:linear-gradient(105deg,var(--navy) 0%,var(--navy-2) 100%);box-shadow:0 1px 0 rgba(255,255,255,0.04),0 4px 24px rgba(0,0,0,0.45);}
+        .hdr-logo-section{width:300px;height:80px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.12);}
+        .hdr-logo{width:290px;height:auto;mix-blend-mode:lighten;display:block;flex-shrink:0;}
+        .hdr-content{flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 22px;}
         .hdr-mid-title{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,0.55);}
         .hdr-mid-sub{font-size:10px;font-weight:400;color:rgba(255,255,255,0.28);margin-top:2px;letter-spacing:0.3px;}
         .hdr-right{display:flex;align-items:center;gap:12px;}
-
-        .hdr-simtime{
-            display:flex;flex-direction:column;align-items:center;
-            padding:5px 14px;border-radius:10px;
-            background:rgba(96,180,232,0.10);border:1px solid rgba(96,180,232,0.20);
-        }
+        .hdr-simtime{display:flex;flex-direction:column;align-items:center;padding:5px 14px;border-radius:10px;background:rgba(96,180,232,0.10);border:1px solid rgba(96,180,232,0.20);}
         .hdr-sim-label{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(96,180,232,0.65);}
         .hdr-sim-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--sky);line-height:1.1;letter-spacing:1px;}
         .hdr-sim-day{font-size:8px;color:rgba(96,180,232,0.50);font-family:'DM Mono',monospace;}
-
         .hdr-div{width:1px;height:28px;background:rgba(255,255,255,0.08);}
         .hdr-live-wrap{display:flex;align-items:center;gap:6px;}
         .live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;animation:lp 2.4s ease-in-out infinite;}
         @keyframes lp{0%,100%{box-shadow:0 0 0 0 transparent;}50%{box-shadow:0 0 0 5px rgba(74,222,128,0.14);}}
         .hdr-live-text{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.45);}
         .hdr-clock{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.28);}
-        .hdr-doctor{display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:var(--r8);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);}
-        .doc-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue-mid));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
-        .doc-name{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85);}
-        .doc-role{font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px;}
+        .hdr-user{display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:var(--r8);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);}
+        .hdr-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue-mid));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+        .hdr-user-name{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85);}
+        .hdr-user-role{font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px;}
+        .hdr-logout{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);border-radius:6px;padding:6px 12px;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+        .hdr-logout:hover{background:rgba(255,255,255,0.1);}
 
         /* ── ALERT ── */
         .alert-banner{display:none;position:sticky;top:80px;z-index:99;padding:10px 24px;background:rgba(185,28,28,0.08);border-bottom:1px solid rgba(185,28,28,0.20);}
@@ -103,17 +76,8 @@
         .alert-dismiss{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;padding:3px 8px;border-radius:6px;}
         .alert-dismiss:hover{background:rgba(0,0,0,0.06);}
 
-        /* ── VIEW TRANSITION ── */
-        @keyframes viewIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-        .view-anim{animation:viewIn 0.22s ease-out;}
-
         /* ── OVERVIEW ── */
-        #view-overview, #view-detail {
-            max-width: 1340px;
-            width: 100%;
-            margin: auto;
-            padding: 40px 22px;
-        }
+        #view-overview{max-width:1340px;margin:0 auto;padding:26px 22px 64px;}
         .ov-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
         .ov-title{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;}
         .ov-title-sub{font-size:12px;font-weight:400;color:var(--muted);margin-left:10px;}
@@ -126,9 +90,9 @@
         .p-critical{background:var(--red-bg);         color:var(--red);   border:1px solid var(--red-bd);}
         .patient-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
         @media(max-width:1100px){.patient-grid{grid-template-columns:repeat(2,1fr);}}
-        @media(max-width:660px) {.patient-grid{grid-template-columns:1fr;}}
+        @media(max-width:660px){.patient-grid{grid-template-columns:1fr;}}
 
-        /* ── PATIENT CARD ── */
+        /* ── PATIENT CARD (doctor overview) ── */
         .pt-card{background:var(--card);border-radius:var(--r20);box-shadow:var(--sh-sm);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:box-shadow 0.22s,transform 0.18s;display:flex;flex-direction:column;border-top:3px solid #e2e8f0;}
         .pt-card:hover{box-shadow:var(--sh-blue);transform:translateY(-3px);}
         .pt-card.lv-normal  {border-top-color:var(--ok);}
@@ -140,7 +104,7 @@
         .ptc-id{font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--ink3);text-transform:uppercase;}
         .ptc-badge{font-size:8px;font-weight:800;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:0.6px;margin-top:1px;}
         .ptc-badge.lv-normal  {background:var(--ok-bg);   color:var(--ok);   border:1px solid var(--ok-bd);}
-        .ptc-badge.lv-elevated{background:var(--amber-bg);color:var(--amber); border:1px solid var(--amber-bd);}
+        .ptc-badge.lv-elevated{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);}
         .ptc-badge.lv-critical{background:var(--red-bg);  color:var(--red);  border:1px solid var(--red-bd);}
         .ptc-badge.lv-low     {background:var(--low-bg);  color:var(--low);  border:1px solid var(--low-bd);}
         .ptc-badge.lv-loading {background:#f8fafc;color:var(--muted);border:1px solid #e2e8f0;}
@@ -176,7 +140,8 @@
         .ptc-view-btn{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r8);padding:5px 12px;cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;}
         .ptc-view-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
 
-        /* ── DETAIL VIEW ── */
+        /* ── DOCTOR DETAIL VIEW ── */
+        #view-detail{max-width:1340px;margin:0 auto;padding:22px 22px 64px;}
         .det-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
         .back-btn{display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r8);padding:6px 14px;cursor:pointer;transition:all 0.15s;}
         .back-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
@@ -234,262 +199,319 @@
         .ref-table td:first-child{font-family:'Sora',sans-serif;font-weight:600;font-size:11px;}
         .pill-sm{display:inline-block;padding:2px 9px;border-radius:99px;font-size:9px;font-weight:700;font-family:'Sora',sans-serif;letter-spacing:0.3px;}
         .pill-sm.ok   {background:var(--ok-bg);   color:var(--ok);   border:1px solid var(--ok-bd);}
-        .pill-sm.amber{background:var(--amber-bg);color:var(--amber); border:1px solid var(--amber-bd);}
+        .pill-sm.amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);}
         .pill-sm.red  {background:var(--red-bg);  color:var(--red);  border:1px solid var(--red-bd);}
         .pill-sm.info {background:var(--low-bg);  color:var(--low);  border:1px solid var(--low-bd);}
-        /* ── APP WRAPPER ── */
-        #app-container {
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        footer{
-            margin-top:auto;
-            text-align:center;
-            padding:20px 24px;
-            font-size:10px;
-            color:var(--muted);
-            letter-spacing:0.2px;
-            border-top:1px solid var(--border);}
-        footer strong{color:var(--ink2);}
         @media(max-width:840px){
             .det-grid{grid-template-columns:1fr;}
             .d-card.hero-card,.d-card.stat-card,.d-card.chart-card,.d-card.spark-card,.d-card.ref-card{grid-column:1;grid-row:auto;}
         }
-        /* ── LOGIN VIEW ── */
-        #view-login {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(125deg, var(--navy) 45%, var(--blue-mid) 100%);
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-        }
-        .login-card {
-            background: var(--blue-50);
-            padding: 50px;
-            border-radius: var(--r20);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            width: 100%;
-            max-width: 560px;
-            text-align: center;
-            border: 1px solid var(--blue-100);
-            animation: viewIn 0.4s ease-out;
-        }
-        .login-logo {
-            max-width: 500px;
-            height: auto;
-            margin: 0 auto 24px auto;
-            display: block;
-        }
-        .login-title { font-size: 30px; font-weight: 800; color: var(--navy); margin-bottom: 6px; letter-spacing: -0.5px;}
-        .login-sub { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
-        .login-input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--r8);
-            font-family: 'Sora', sans-serif;
-            font-size: 17px;
-            background: #f8fafc;
-            transition: border-color 0.2s;
-        }
-        .login-input:focus { outline: none; border-color: var(--blue); background: #fff; }
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--blue);
-            color: #fff;
-            border: none;
-            border-radius: var(--r8);
-            font-family: 'Sora', sans-serif;
-            font-weight: 700;
-            font-size: 17px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-        .login-btn:hover { background: var(--navy-2); transform: translateY(-1px); box-shadow: var(--sh-sm); }
-        .login-err { color: var(--red); font-size: 12px; font-weight: 600; margin-top: 16px; display: none; }
 
-        /* ── PATIENT MODE SCALING ── */
-        #view-detail.patient-mode {
-            max-width: 1050px;
-            margin: auto;
+        /* ── PATIENT VIEW ── */
+        #view-patient{
+            min-height:calc(100vh - 80px);
+            background:linear-gradient(160deg, #f0fdf4 0%, #eff6ff 100%);
+            padding:36px 20px 72px;
         }
-        #view-detail.patient-mode .det-nav {
-            justify-content: center;
-            text-align: center;
-            margin-bottom: 24px;
+        .pat-wrap{max-width:680px;margin:0 auto;}
+
+        .pat-greeting{margin-bottom:28px;}
+        .pat-greet-main{font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-0.4px;}
+        .pat-greet-sub{font-size:14px;color:var(--ink3);margin-top:4px;font-weight:400;}
+
+        .pat-card{
+            background:#fff;border-radius:var(--r24);
+            box-shadow:0 2px 8px rgba(0,0,0,0.06),0 8px 28px rgba(0,0,0,0.07);
+            border:1px solid rgba(15,23,42,0.06);
+            margin-bottom:14px;
+            overflow:hidden;
+            transition:box-shadow 0.2s;
         }
-        .patient-mode .hero-card {
-            grid-row: 1 / 3;
-            display: flex;
-            flex-direction: column;
-        }
-        .patient-mode .circ-wrap {
-            margin-top: auto;
-            padding-bottom: 10px;
-        }
+
+        /* Status card */
+        .pat-status-card{padding:40px 32px 36px;text-align:center;border-top:5px solid #e2e8f0;transition:border-top-color 0.4s,background 0.4s;}
+        .pat-status-card.s-ok    {border-top-color:var(--ok);    background:linear-gradient(to bottom,rgba(21,128,61,0.03),#fff 60%);}
+        .pat-status-card.s-high  {border-top-color:var(--amber); background:linear-gradient(to bottom,rgba(180,83,9,0.04),#fff 60%);}
+        .pat-status-card.s-vhigh {border-top-color:var(--red);   background:linear-gradient(to bottom,rgba(185,28,28,0.05),#fff 60%);}
+        .pat-status-card.s-low   {border-top-color:var(--low);   background:linear-gradient(to bottom,rgba(29,78,216,0.04),#fff 60%);}
+
+        .pat-status-emoji{display:none;}
+        .pat-reading-big{font-family:'DM Mono',monospace;font-size:88px;font-weight:500;line-height:1;letter-spacing:-3px;color:var(--blue);transition:color 0.4s;margin-bottom:2px;}
+        .pat-reading-big.s-ok   {color:#15803d;}
+        .pat-reading-big.s-high {color:var(--amber);}
+        .pat-reading-big.s-vhigh{color:var(--red);}
+        .pat-reading-big.s-low  {color:var(--low);}
+        .pat-reading-unit{font-size:16px;color:var(--muted);font-weight:400;margin-bottom:16px;}
+        .pat-status-headline{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+        .pat-status-desc{font-size:15px;color:var(--ink3);line-height:1.65;max-width:420px;margin:0 auto;}
+
+        /* What's happening card */
+        .pat-info-card{padding:28px 32px;}
+        .pat-info-card-label{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+        .pat-phase-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+        .pat-phase-desc{font-size:14px;color:var(--ink3);line-height:1.7;}
+
+        /* Circadian card */
+        .pat-circ-card{padding:28px 32px;}
+        .pat-circ-title{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+        #patient-circadian-canvas{width:100%;height:44px;display:block;margin-bottom:8px;}
+        .pat-circ-times{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;padding:0 1px;}
+        .pat-circ-simtime{font-size:12px;color:var(--ink3);margin-top:10px;text-align:center;}
+
+        /* Chart card */
+        .pat-chart-card{padding:28px 32px 24px;}
+        .pat-chart-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+        .pat-chart-title{font-size:16px;font-weight:700;color:var(--ink);}
+        .pat-chart-sub{font-size:11px;color:var(--muted);}
+        #patient-history-canvas{display:block;width:100%;height:220px;border-radius:var(--r8);cursor:grab;}
+        #patient-history-canvas:active{cursor:grabbing;}
+
+        /* Trend strip card */
+        .pat-trend-card{padding:24px 32px;}
+        .pat-trend-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+        .pat-trend-title{font-size:14px;font-weight:700;color:var(--ink);}
+        .pat-trend-sub{font-size:11px;color:var(--muted);}
+        #patient-spark-canvas{display:block;width:100%;height:52px;}
+
+        /* About card */
+        .pat-about-card{padding:28px 32px;display:flex;gap:16px;align-items:flex-start;}
+        .pat-about-icon{font-size:28px;flex-shrink:0;line-height:1;margin-top:2px;}
+        .pat-about-label{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+        .pat-about-text{font-size:13px;color:var(--ink3);line-height:1.7;}
+
+        /* Footer */
+        footer{text-align:center;padding:20px 24px;font-size:10px;color:var(--muted);letter-spacing:0.2px;border-top:1px solid var(--border);}
+        footer strong{color:var(--ink2);}
     </style>
 </head>
 <body>
+
+<!-- ── LOGIN (untouched) ── -->
 <div id="view-login">
     <div class="login-card">
-        <img src="/logo.png" alt="CortiSense Logo" class="login-logo" onerror="this.style.display='none'" />
+        <img src="/logo.png" alt="CortiSense Logo" class="login-logo" onerror="this.style.display='none'"/>
         <div class="login-title">CortiSense Secure</div>
         <div class="login-sub">Clinical Portal Access</div>
-        <input type="text" id="login-user" class="login-input" placeholder="Username" />
-        <input type="password" id="login-pass" class="login-input" placeholder="Password" />
+        <input type="text" id="login-user" class="login-input" placeholder="Username"/>
+        <input type="password" id="login-pass" class="login-input" placeholder="Password"/>
         <button class="login-btn" onclick="attemptLogin()">Sign In</button>
         <div id="login-err" class="login-err">Invalid username or password.</div>
     </div>
 </div>
 
-<div id="app-container" style="display: none;">
-<header class="site-header">
-    <!--
-      Logo section: 300px wide, 80px tall, overflow:hidden.
-      The <img> renders at 290px wide × ~193px tall (width:290px; height:auto).
-      overflow:hidden clips the 193px down to 80px, showing the vertical centre.
-      mix-blend-mode:lighten removes the black logo background against the dark header.
-      Net result: the logo appears at ~290px wide — a dramatic improvement over sizing by height alone.
-    -->
-    <div class="hdr-logo-section">
-        <img src="/logo.png" alt="CortiSense" class="hdr-logo" onerror="this.parentElement.style.display='none'"/>
+<div id="app-container" style="display:none;flex-direction:column;min-height:100vh;">
+
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="hdr-logo-section">
+            <img src="/logo.png" alt="CortiSense" class="hdr-logo" onerror="this.parentElement.style.display='none'"/>
+        </div>
+        <div class="hdr-content">
+            <div>
+                <div class="hdr-mid-title" id="hdr-title">Clinical Dashboard</div>
+                <div class="hdr-mid-sub" id="hdr-sub">Wearable Cortisol Monitoring · Proof of Concept</div>
+            </div>
+            <div class="hdr-right">
+                <div class="hdr-simtime" id="hdr-simtime-wrap">
+                    <div class="hdr-sim-label">Sim Time</div>
+                    <div class="hdr-sim-val" id="hdr-sim-val">—</div>
+                    <div class="hdr-sim-day" id="hdr-sim-day">—</div>
+                </div>
+                <div class="hdr-div"></div>
+                <div class="hdr-live-wrap">
+                    <div class="live-dot"></div>
+                    <div class="hdr-live-text" id="hdr-status">Live</div>
+                </div>
+                <div class="hdr-clock" id="hdr-clock"></div>
+                <div class="hdr-div"></div>
+                <div class="hdr-user">
+                    <div class="hdr-avatar" id="hdr-avatar">Dr</div>
+                    <div>
+                        <div class="hdr-user-name" id="hdr-user-name">Clinical User</div>
+                        <div class="hdr-user-role" id="hdr-user-role">DAPP Proof of Concept</div>
+                    </div>
+                </div>
+                <button class="hdr-logout" onclick="logout()">Log Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="alert-banner" id="alert-banner">
+        <div class="alert-icon">⚠</div>
+        <div class="alert-text" id="alert-text">Critical cortisol detected</div>
+        <button class="alert-dismiss" onclick="dismissAlert()">Dismiss</button>
     </div>
 
-    <div class="hdr-content">
-        <div>
-            <div class="hdr-mid-title">Clinical Dashboard</div>
-            <div class="hdr-mid-sub">Wearable Cortisol Monitoring · Proof of Concept</div>
+    <!-- DOCTOR: Overview -->
+    <div id="view-overview" style="display:none">
+        <div class="ov-toolbar">
+            <div><span class="ov-title">Patient Overview</span><span class="ov-title-sub">6 patients monitored</span></div>
+            <div class="ov-pills">
+                <div class="ov-pill p-total">   <span class="dot"></span><span id="ov-total">6</span>&nbsp;Monitored</div>
+                <div class="ov-pill p-normal">  <span class="dot"></span><span id="ov-norm">—</span>&nbsp;Normal</div>
+                <div class="ov-pill p-elevated"><span class="dot"></span><span id="ov-elev">—</span>&nbsp;Elevated</div>
+                <div class="ov-pill p-critical"><span class="dot"></span><span id="ov-crit">—</span>&nbsp;Critical</div>
+            </div>
         </div>
-        <div class="hdr-right">
-            <div class="hdr-simtime">
-                <div class="hdr-sim-label">Sim Time</div>
-                <div class="hdr-sim-val" id="hdr-sim-val">—</div>
-                <div class="hdr-sim-day" id="hdr-sim-day">—</div>
+        <div class="patient-grid" id="patient-grid"></div>
+    </div>
+
+    <!-- DOCTOR: Detail -->
+    <div id="view-detail" style="display:none">
+        <div class="det-nav">
+            <button class="back-btn" onclick="showOverview()">← Overview</button>
+            <div>
+                <span class="det-title" id="det-name">—</span>
+                <span class="det-sub">Individual Patient Record</span>
             </div>
-            <div class="hdr-div"></div>
-            <div class="hdr-live-wrap">
-                <div class="live-dot"></div>
-                <div class="hdr-live-text" id="hdr-status">Live</div>
-            </div>
-            <div class="hdr-clock" id="hdr-clock"></div>
-            <div class="hdr-div"></div>
-            <div class="hdr-doctor">
-                <div class="doc-avatar">Dr</div>
-                <div>
-                    <div class="doc-name">Clinical User</div>
-                    <div class="doc-role">DAPP Proof of Concept</div>
+        </div>
+        <div class="det-grid">
+            <div class="d-card hero-card">
+                <div class="d-lbl">Current Cortisol</div>
+                <div class="d-val" id="d-val"><span id="d-cur">—</span><span class="d-unit">nmol/L</span></div>
+                <div class="d-trend"><span class="d-arr" id="d-arr">—</span><span id="d-trend-txt">Loading…</span></div>
+                <div id="d-phase" class="d-phase-pill ph-baseline">Baseline</div>
+                <div class="circ-wrap">
+                    <div class="circ-lbl">Circadian Position</div>
+                    <canvas id="circadian-canvas"></canvas>
+                    <div class="circ-simtime" id="d-simtime">Sim —</div>
                 </div>
             </div>
-            <div class="hdr-div"></div>
-            <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); border-radius:6px; padding:6px 12px; font-family:'Sora',sans-serif; font-size:10px; font-weight:700; cursor:pointer; transition: 0.2s;">
-                Log Out
-            </button>
+            <div class="d-card chart-card">
+                <div style="display:flex;align-items:baseline;margin-bottom:10px;">
+                    <div class="d-card-title" style="margin-bottom:0;">Cortisol History</div>
+                    <span class="d-card-sub">scroll to zoom · drag to pan · dbl-click reset</span>
+                </div>
+                <div class="chart-legend">
+                    <div class="leg-item"><div class="leg-sw" style="background:#1565c0"></div>Cortisol</div>
+                    <div class="leg-item"><div class="leg-dash" style="border-color:#b45309;opacity:.8"></div>Elevated (550)</div>
+                    <div class="leg-item"><div class="leg-dash" style="border-color:#b91c1c;opacity:.8"></div>Critical (700)</div>
+                    <div class="leg-item"><div class="leg-dash" style="border-color:#1d4ed8;opacity:.7"></div>Low (150)</div>
+                </div>
+                <canvas id="history-canvas"></canvas>
+            </div>
+            <div class="d-card stat-card">
+                <div class="d-card-title">Session Statistics</div>
+                <div class="d-stats-grid">
+                    <div class="d-stat"><div class="d-stat-lbl">Session Peak</div><div class="d-stat-val" id="d-peak">—</div><div class="d-stat-sub">nmol/L</div></div>
+                    <div class="d-stat"><div class="d-stat-lbl">Session Low</div><div class="d-stat-val" id="d-low">—</div><div class="d-stat-sub">nmol/L</div></div>
+                    <div class="d-stat"><div class="d-stat-lbl">Readings</div><div class="d-stat-val" id="d-count">0</div><div class="d-stat-sub">this session</div></div>
+                    <div class="d-stat"><div class="d-stat-lbl">1-hr Mean</div><div class="d-stat-val" id="d-mean">—</div><div class="d-stat-sub">nmol/L</div></div>
+                    <div class="d-stat"><div class="d-stat-lbl">Rate of Change</div><div class="d-stat-val" id="d-roc">—</div><div class="d-stat-sub">nmol/L·sim h⁻¹</div></div>
+                    <div class="d-stat"><div class="d-stat-lbl">Sim Day</div><div class="d-stat-val" id="d-simday">—</div><div class="d-stat-sub">of monitoring</div></div>
+                </div>
+            </div>
+            <div class="d-card spark-card">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                    <div class="d-card-title" style="margin-bottom:0;">2-Hour Trend</div>
+                    <div style="font-size:10px;color:var(--muted);" id="d-spark-sub">—</div>
+                </div>
+                <canvas id="spark-canvas"></canvas>
+            </div>
+            <div class="d-card ref-card">
+                <div class="d-card-title">Reference Ranges</div>
+                <table class="ref-table">
+                    <thead><tr><th>Phase / Threshold</th><th>Range (nmol/L)</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr><td>Morning peak (08:00–10:00)</td><td>400–620</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                    <tr><td>Daytime declining</td><td>150–400</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                    <tr><td>Evening / nadir</td><td>80–200</td><td><span class="pill-sm ok">Normal</span></td></tr>
+                    <tr><td>Stress-rise event</td><td>+100–300 above base</td><td><span class="pill-sm amber">Expected</span></td></tr>
+                    <tr><td>Elevated threshold</td><td>&gt; 550</td><td><span class="pill-sm amber">Review</span></td></tr>
+                    <tr><td>Critical threshold</td><td>&gt; 700</td><td><span class="pill-sm red">Alert</span></td></tr>
+                    <tr><td>Low threshold</td><td>&lt; 150</td><td><span class="pill-sm info">Low</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</header>
 
-<div class="alert-banner" id="alert-banner">
-    <div class="alert-icon">⚠</div>
-    <div class="alert-text" id="alert-text">Critical cortisol detected</div>
-    <button class="alert-dismiss" onclick="dismissAlert()">Dismiss</button>
+    <!-- PATIENT VIEW -->
+    <div id="view-patient" style="display:none">
+        <div class="pat-wrap view-anim">
+
+            <div class="pat-greeting">
+                <div class="pat-greet-main" id="pat-greet">Good morning</div>
+                <div class="pat-greet-sub">Here's how your cortisol looks right now</div>
+            </div>
+
+            <!-- Big status card -->
+            <div class="pat-card">
+                <div class="pat-status-card" id="pat-status-card">
+                    <div class="pat-status-emoji" id="pat-emoji">⏳</div>
+                    <div class="pat-reading-big" id="pat-reading">—</div>
+                    <div class="pat-reading-unit">nmol/L (nanomoles per litre)</div>
+                    <div class="pat-status-headline" id="pat-headline">Loading your reading…</div>
+                    <div class="pat-status-desc" id="pat-desc">Please wait a moment while we fetch your latest data.</div>
+                </div>
+            </div>
+
+            <!-- What's happening -->
+            <div class="pat-card">
+                <div class="pat-info-card">
+                    <div class="pat-info-card-label">What's happening right now?</div>
+                    <div class="pat-phase-title" id="pat-phase-title">—</div>
+                    <div class="pat-phase-desc" id="pat-phase-desc">—</div>
+                </div>
+            </div>
+
+            <!-- Where are you in the day -->
+            <div class="pat-card">
+                <div class="pat-circ-card">
+                    <div class="pat-circ-title">Where are you in the day?</div>
+                    <canvas id="patient-circadian-canvas"></canvas>
+                    <div class="pat-circ-times">
+                        <span>Midnight</span><span>6am</span><span>Midday</span><span>6pm</span><span>Midnight</span>
+                    </div>
+                    <div class="pat-circ-simtime" id="pat-simtime">—</div>
+                </div>
+            </div>
+
+            <!-- Today's readings chart -->
+            <div class="pat-card">
+                <div class="pat-chart-card">
+                    <div class="pat-chart-header">
+                        <div class="pat-chart-title">Your readings today</div>
+                        <div class="pat-chart-sub">Scroll to zoom · drag to explore</div>
+                    </div>
+                    <canvas id="patient-history-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- 2-hour trend -->
+            <div class="pat-card">
+                <div class="pat-trend-card">
+                    <div class="pat-trend-header">
+                        <div class="pat-trend-title">Last 2 hours</div>
+                        <div class="pat-trend-sub" id="pat-spark-sub">—</div>
+                    </div>
+                    <canvas id="patient-spark-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- About cortisol -->
+            <div class="pat-card">
+                <div class="pat-about-card">
+                    <div class="pat-about-icon">💡</div>
+                    <div>
+                        <div class="pat-about-label">About your readings</div>
+                        <div class="pat-about-text">
+                            Cortisol is a hormone your body produces naturally throughout the day. It's highest in the morning — this helps you wake up and feel energised — then gradually falls through the afternoon and evening, reaching its lowest point at night. Short spikes are completely normal and are often caused by stress, exercise, or even a strong coffee. Your readings are measured in nanomoles per litre (nmol/L). This app is a research demonstration — always speak to your GP if you have concerns about your health.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <strong>CortiSense v2.0</strong> &nbsp;·&nbsp;
+        Simulated data only — not for clinical use &nbsp;·&nbsp;
+        Imperial College London · DAPP Year 3 Proof of Concept
+    </footer>
+
 </div>
-
-<div id="view-overview">
-    <div class="ov-toolbar">
-        <div>
-            <span class="ov-title">Patient Overview</span>
-            <span class="ov-title-sub">6 patients monitored</span>
-        </div>
-        <div class="ov-pills">
-            <div class="ov-pill p-total">   <span class="dot"></span><span id="ov-total">6</span>&nbsp;Monitored</div>
-            <div class="ov-pill p-normal">  <span class="dot"></span><span id="ov-norm">—</span>&nbsp;Normal</div>
-            <div class="ov-pill p-elevated"><span class="dot"></span><span id="ov-elev">—</span>&nbsp;Elevated</div>
-            <div class="ov-pill p-critical"><span class="dot"></span><span id="ov-crit">—</span>&nbsp;Critical</div>
-        </div>
-    </div>
-    <div class="patient-grid" id="patient-grid"></div>
-</div>
-
-<div id="view-detail" style="display:none">
-    <div class="det-nav">
-        <button id="btn-back-overview" class="back-btn" onclick="showOverview()">← Overview</button>
-        <div>
-            <span class="det-title" id="det-name">—</span>
-            <span class="det-sub">Individual Patient Record</span>
-        </div>
-    </div>
-    <div class="det-grid">
-        <div class="d-card hero-card">
-            <div class="d-lbl">Current Cortisol</div>
-            <div class="d-val" id="d-val"><span id="d-cur">—</span><span class="d-unit">nmol/L</span></div>
-            <div class="d-trend"><span class="d-arr" id="d-arr">—</span><span id="d-trend-txt">Loading…</span></div>
-            <div id="d-phase" class="d-phase-pill ph-baseline">Baseline</div>
-            <div class="circ-wrap">
-                <div class="circ-lbl">Circadian Position</div>
-                <canvas id="circadian-canvas"></canvas>
-                <div class="circ-simtime" id="d-simtime">Sim —</div>
-            </div>
-        </div>
-        <div class="d-card chart-card">
-            <div style="display:flex;align-items:baseline;margin-bottom:10px;">
-                <div class="d-card-title" style="margin-bottom:0;">Cortisol History</div>
-                <span class="d-card-sub">scroll to zoom · drag to pan · dbl-click reset</span>
-            </div>
-            <div class="chart-legend">
-                <div class="leg-item"><div class="leg-sw" style="background:#1565c0"></div>Cortisol</div>
-                <div class="leg-item"><div class="leg-dash" style="border-color:#b45309;opacity:.8"></div>Elevated (550)</div>
-                <div class="leg-item"><div class="leg-dash" style="border-color:#b91c1c;opacity:.8"></div>Critical (700)</div>
-                <div class="leg-item"><div class="leg-dash" style="border-color:#1d4ed8;opacity:.7"></div>Low (150)</div>
-            </div>
-            <canvas id="history-canvas"></canvas>
-        </div>
-        <div id="card-session-stats" class="d-card stat-card">
-            <div class="d-card-title">Session Statistics</div>
-            <div class="d-stats-grid">
-                <div class="d-stat"><div class="d-stat-lbl">Session Peak</div><div class="d-stat-val" id="d-peak">—</div><div class="d-stat-sub">nmol/L</div></div>
-                <div class="d-stat"><div class="d-stat-lbl">Session Low</div><div class="d-stat-val" id="d-low">—</div><div class="d-stat-sub">nmol/L</div></div>
-                <div class="d-stat"><div class="d-stat-lbl">Readings</div><div class="d-stat-val" id="d-count">0</div><div class="d-stat-sub">this session</div></div>
-                <div class="d-stat"><div class="d-stat-lbl">1-hr Mean</div><div class="d-stat-val" id="d-mean">—</div><div class="d-stat-sub">nmol/L</div></div>
-                <div class="d-stat"><div class="d-stat-lbl">Rate of Change</div><div class="d-stat-val" id="d-roc">—</div><div class="d-stat-sub">nmol/L·sim h⁻¹</div></div>
-                <div class="d-stat"><div class="d-stat-lbl">Sim Day</div><div class="d-stat-val" id="d-simday">—</div><div class="d-stat-sub">of monitoring</div></div>
-            </div>
-        </div>
-        <div id="card-spark" class="d-card spark-card">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                <div class="d-card-title" style="margin-bottom:0;">2-Hour Trend</div>
-                <div style="font-size:10px;color:var(--muted);" id="d-spark-sub">—</div>
-            </div>
-            <canvas id="spark-canvas"></canvas>
-        </div>
-        <div id="card-ref" class="d-card ref-card">
-            <div class="d-card-title">Reference Ranges</div>
-            <table class="ref-table">
-                <thead><tr><th>Phase / Threshold</th><th>Range (nmol/L)</th><th>Status</th></tr></thead>
-                <tbody>
-                <tr><td>Morning peak (08:00–10:00)</td><td>400–620</td><td><span class="pill-sm ok">Normal</span></td></tr>
-                <tr><td>Daytime declining</td><td>150–400</td><td><span class="pill-sm ok">Normal</span></td></tr>
-                <tr><td>Evening / nadir</td><td>80–200</td><td><span class="pill-sm ok">Normal</span></td></tr>
-                <tr><td>Stress-rise event</td><td>+100–300 above base</td><td><span class="pill-sm amber">Expected</span></td></tr>
-                <tr><td>Elevated threshold</td><td>&gt; 550</td><td><span class="pill-sm amber">Review</span></td></tr>
-                <tr><td>Critical threshold</td><td>&gt; 700</td><td><span class="pill-sm red">Alert</span></td></tr>
-                <tr><td>Low threshold</td><td>&lt; 150</td><td><span class="pill-sm info">Low</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<footer>
-    <strong>CortiSense v2.0</strong> &nbsp;·&nbsp;
-    Simulated data only — not for clinical use &nbsp;·&nbsp;
-    Imperial College London · DAPP Year 3 Proof of Concept
-</footer>
 
 <script>
     "use strict";
@@ -500,23 +522,68 @@
     const PH_LABELS={morning_peak:'Morning Peak',declining:'Declining',stress_rise:'Stress Rise',nadir:'Nadir',baseline:'Baseline'};
     const C={blue:'#1565c0',amber:'#b45309',red:'#b91c1c',low:'#1d4ed8',ok:'#15803d',muted:'#94a3b8',grid:'rgba(15,23,42,0.04)',border:'rgba(15,23,42,0.08)'};
 
+    const CREDENTIALS={
+        'dr_smith':  {pass:'doctor123', role:'doctor'},
+        'patient1':  {pass:'pass1',     role:'patient', subjectId:'user-1'},
+        'patient2':  {pass:'pass2',     role:'patient', subjectId:'user-2'},
+        'patient3':  {pass:'pass3',     role:'patient', subjectId:'user-3'},
+        'patient4':  {pass:'pass4',     role:'patient', subjectId:'user-4'},
+        'patient5':  {pass:'pass5',     role:'patient', subjectId:'user-5'},
+        'patient6':  {pass:'pass6',     role:'patient', subjectId:'user-6'},
+    };
+
+    const PAT_PHASE_INFO={
+        morning_peak:{
+            title:'Your morning rise ☀️',
+            desc:'Cortisol is naturally at its highest in the morning — this is your body\'s way of energising you for the day ahead. These levels are completely normal and expected.'
+        },
+        declining:{
+            title:'Levels coming down 📉',
+            desc:'Your cortisol is gradually decreasing through the afternoon. This is exactly what it should be doing — a steady decline through the day is a sign of a healthy rhythm.'
+        },
+        stress_rise:{
+            title:'Stress response detected ⚡',
+            desc:'Your cortisol has risen sharply above its usual level. This commonly happens after something stressful, intense exercise, or even a strong coffee. It should return to normal within about an hour.'
+        },
+        nadir:{
+            title:'Evening wind-down 🌙',
+            desc:'Cortisol reaches its lowest point in the evening. Low levels in the evening help your body relax and prepare for a good night\'s sleep — this is exactly what should happen.'
+        },
+        baseline:{
+            title:'Steady and stable 📊',
+            desc:'Your cortisol is sitting at a normal, stable level right now. Nothing to worry about — your body is ticking along just as it should.'
+        }
+    };
+
+    function getPatientStatus(v,phase){
+        if(v>=700) return{emoji:'🔴',cls:'s-vhigh',headline:'Quite a bit higher than usual',desc:'Your cortisol is significantly elevated right now. This can happen during intense stress, illness, or very heavy exercise. If this reading persists for more than a couple of hours, it\'s worth mentioning to your GP.'};
+        if(v>=550) return{emoji:'🟡',cls:'s-high', headline:'A little high',desc:'Your cortisol is slightly above the usual range. This is often caused by stress, a busy morning, exercise, or caffeine. Keep an eye on it — it should come down on its own.'};
+        if(v<80)   return{emoji:'🔵',cls:'s-low',  headline:'Below the usual range',desc:'Your cortisol is lower than we\'d typically expect at this time of day. If you\'re feeling tired or foggy, this could be why. Mention it to your GP if you notice this regularly.'};
+        if(v<150)  return{emoji:'💙',cls:'s-low',  headline:'On the lower side',desc:'Your cortisol is a little below the typical range. This is often perfectly fine — especially in the evening when levels are naturally low.'};
+        if(phase==='morning_peak') return{emoji:'✅',cls:'s-ok',headline:'Looking great this morning',desc:'Your cortisol is exactly where it should be for this time of morning. Your body\'s natural rhythm is working perfectly.'};
+        return{emoji:'✅',cls:'s-ok',headline:'All good',desc:'Your cortisol is within the normal range. Everything looks healthy and as expected.'};
+    }
+
     const ovStore={};
     let detTs=[],detC=[],detPhase='baseline',detPrev=null;
-    let ovTimer=null,detTimer=null,curSubject=null;
+    let ovTimer=null,detTimer=null,patTimer=null,curSubject=null,curRole=null;
     let zoomCustom=false,vMinT=0,vMaxT=0,dragging=false,lastMX=0;
+    let patTs=[],patC=[],patPhase='baseline',patZoom=false,pVMinT=0,pVMaxT=0,pDrag=false,pLastX=0;
     let alertDismissed=false;
 
+    /* ── Sim time ── */
     function getSimTime(n){
         if(!n)return null;
         const total=21600+n*60,day=Math.floor(total/86400)+1,secs=total%86400;
-        const h=String(Math.floor(secs/3600)).padStart(2,'0'),m=String(Math.floor((secs%3600)/60)).padStart(2,'0');
-        return{time:h+':'+m,day,secs};
+        return{time:String(Math.floor(secs/3600)).padStart(2,'0')+':'+String(Math.floor((secs%3600)/60)).padStart(2,'0'),day,secs};
     }
     function updateSimDisplay(n){
         const st=getSimTime(n);if(!st)return;
         document.getElementById('hdr-sim-val').textContent=st.time;
         document.getElementById('hdr-sim-day').textContent='Sim Day '+st.day;
     }
+
+    /* ── Clock ── */
     function clock(){
         const n=new Date();
         document.getElementById('hdr-clock').textContent=
@@ -525,8 +592,15 @@
     }
     setInterval(clock,1000);clock();
 
+    /* ── Greeting ── */
+    function getGreeting(){
+        const h=new Date().getHours();
+        if(h<12)return'Good morning';if(h<18)return'Good afternoon';return'Good evening';
+    }
+
+    /* ── Alerts ── */
     function checkAlerts(){
-        if(alertDismissed)return;
+        if(alertDismissed||curRole!=='doctor')return;
         const crits=[];
         for(const sid of SUBJECTS){const s=ovStore[sid];if(!s||!s.cortisol.length)continue;const v=s.cortisol[s.cortisol.length-1];if(v>=THR.veryHigh||v<THR.low)crits.push(PT_LABELS[sid]+' ('+v.toFixed(1)+' nmol/L)');}
         const b=document.getElementById('alert-banner');
@@ -535,39 +609,80 @@
     }
     function dismissAlert(){alertDismissed=true;document.getElementById('alert-banner').className='alert-banner';}
 
+    /* ── Helpers ── */
     function getLevel(v){if(v>=THR.veryHigh)return'critical';if(v>=THR.highAmber)return'elevated';if(v<THR.low)return'critical';if(v<THR.lowAmber)return'low';return'normal';}
     function getLvLabel(l){return{normal:'Normal',elevated:'Elevated',critical:'Critical',low:'Low'}[l]||'—';}
     function animView(id){const el=document.getElementById(id);el.classList.remove('view-anim');void el.offsetWidth;el.classList.add('view-anim');}
+    function hideAll(){['view-overview','view-detail','view-patient'].forEach(id=>document.getElementById(id).style.display='none');}
 
+    /* ── Login ── */
+    function attemptLogin(){
+        const user=document.getElementById('login-user').value;
+        const pass=document.getElementById('login-pass').value;
+        const account=CREDENTIALS[user];
+        if(account&&account.pass===pass){
+            document.getElementById('view-login').style.display='none';
+            document.getElementById('app-container').style.display='flex';
+            document.getElementById('login-err').style.display='none';
+            curRole=account.role;
+            if(account.role==='doctor'){
+                document.getElementById('hdr-avatar').textContent='Dr';
+                document.getElementById('hdr-user-name').textContent='Dr Smith';
+                document.getElementById('hdr-user-role').textContent='Clinician';
+                document.getElementById('hdr-title').textContent='Clinical Dashboard';
+                document.getElementById('hdr-sub').textContent='Wearable Cortisol Monitoring · Proof of Concept';
+                buildCards();showOverview();
+            } else {
+                document.getElementById('hdr-avatar').textContent='Me';
+                document.getElementById('hdr-user-name').textContent=PT_LABELS[account.subjectId]||account.subjectId;
+                document.getElementById('hdr-user-role').textContent='Personal Monitor';
+                document.getElementById('hdr-title').textContent='My CortiSense';
+                document.getElementById('hdr-sub').textContent='Personal Cortisol Monitoring · Simulated Demo';
+                showPatient(account.subjectId);
+            }
+        } else {
+            document.getElementById('login-err').style.display='block';
+        }
+    }
+
+    /* ── Logout ── */
+    function logout(){
+        curRole=null;curSubject=null;
+        clearInterval(ovTimer);clearInterval(detTimer);clearInterval(patTimer);
+        ovTimer=detTimer=patTimer=null;
+        document.getElementById('login-pass').value='';
+        document.getElementById('app-container').style.display='none';
+        document.getElementById('view-login').style.display='flex';
+        document.getElementById('login-err').style.display='none';
+        alertDismissed=false;
+    }
+
+    /* ── Doctor: overview ── */
     function showOverview(){
-        document.getElementById('view-overview').style.display='';document.getElementById('view-detail').style.display='none';
+        hideAll();document.getElementById('view-overview').style.display='';
         animView('view-overview');clearInterval(detTimer);detTimer=null;curSubject=null;detTs=[];detC=[];alertDismissed=false;
         fetchAllOv();ovTimer=setInterval(fetchAllOv,POLL_MS);
     }
+
+    /* ── Doctor: detail ── */
     function showDetail(sid){
-        const isDoc = (currentUserRole === 'doctor');
-        const viewDetail = document.getElementById('view-detail');
-        if (isDoc) {
-            viewDetail.classList.remove('patient-mode');
-        } else {
-            viewDetail.classList.add('patient-mode');
-        }
-        document.getElementById('btn-back-overview').style.display = isDoc ? 'flex' : 'none';
-        document.getElementById('card-session-stats').style.display = isDoc ? 'flex' : 'none';
-        document.getElementById('card-spark').style.display = isDoc ? 'block' : 'none';
-        document.getElementById('card-ref').style.display = isDoc ? 'block' : 'none';
-        document.getElementById('view-overview').style.display='none';
-        document.getElementById('view-detail').style.display='';
-        animView('view-detail');
-        clearInterval(ovTimer);ovTimer=null;
-        document.getElementById('view-overview').style.display='none';document.getElementById('view-detail').style.display='';
+        hideAll();document.getElementById('view-detail').style.display='';
         animView('view-detail');clearInterval(ovTimer);ovTimer=null;
         curSubject=sid;detTs=[];detC=[];detPhase='baseline';detPrev=null;zoomCustom=false;
         document.getElementById('det-name').textContent=PT_LABELS[sid]||sid;
         fetchDet();detTimer=setInterval(fetchDet,POLL_MS);
-        document.getElementById('view-overview').style.display='none';
     }
 
+    /* ── Patient view ── */
+    function showPatient(sid){
+        hideAll();document.getElementById('view-patient').style.display='';
+        clearInterval(ovTimer);clearInterval(detTimer);ovTimer=detTimer=null;
+        curSubject=sid;patTs=[];patC=[];patPhase='baseline';patZoom=false;
+        document.getElementById('pat-greet').textContent=getGreeting();
+        fetchPat();patTimer=setInterval(fetchPat,POLL_MS);
+    }
+
+    /* ── Card build (doctor) ── */
     function buildCards(){
         const grid=document.getElementById('patient-grid');grid.innerHTML='';
         for(const sid of SUBJECTS){
@@ -583,6 +698,7 @@
         }
     }
 
+    /* ── Overview fetch ── */
     async function fetchOneOv(sid){
         try{
             const r=await fetch(`/telemetry?subject=${sid}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();
@@ -634,20 +750,168 @@
         ctx.strokeStyle='#1565c0';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.stroke();
     }
 
-    function drawCircadianTimeline(simSecs){
-        const canvas=document.getElementById('circadian-canvas');if(!canvas)return;
-        const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||246,H=40;
-        canvas.width=W*dpr;canvas.height=H*dpr;const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-        const DAY=86400,xOf=s=>(s/DAY)*W;
-        ctx.fillStyle='#e2e8f0';ctx.beginPath();ctx.roundRect(0,12,W,12,4);ctx.fill();
-        [[0,21600,'#0f172a'],[21600,25200,'#7c2d12'],[25200,36000,'#b45309'],[36000,50400,'#1565c0'],[50400,52200,'#b91c1c'],[52200,68400,'#1565c0'],[68400,79200,'#334155'],[79200,86400,'#0f172a']].forEach(([s,e,col])=>{ctx.fillStyle=col;ctx.fillRect(xOf(s),12,Math.max(1,xOf(e)-xOf(s)),12);});
-        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.roundRect(0,12,6,12,[4,0,0,4]);ctx.fill();ctx.beginPath();ctx.roundRect(W-6,12,6,12,[0,4,4,0]);ctx.fill();
-        const nx=Math.min(Math.max(xOf(simSecs%DAY),5),W-5);
-        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.moveTo(nx,25);ctx.lineTo(nx-4.5,34);ctx.lineTo(nx+4.5,34);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#ffffff';ctx.font='bold 6px "Sora",sans-serif';ctx.textAlign='center';ctx.fillText('NOW',Math.min(Math.max(nx,16),W-16),10);
-        ctx.fillStyle='#94a3b8';ctx.font='7px "DM Mono",monospace';[[0,'00'],[21600,'06'],[43200,'12'],[64800,'18'],[86400,'24']].forEach(([s,l])=>{ctx.textAlign=s===0?'left':s===86400?'right':'center';ctx.fillText(l+':00',xOf(s),40);});
+    /* ── Patient fetch & render ── */
+    async function fetchPat(){
+        if(!curSubject)return;
+        try{
+            const r=await fetch(`/telemetry?subject=${curSubject}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();
+            const iTs=Array.isArray(d.ts)?d.ts:[],iC=Array.isArray(d.cortisol)?d.cortisol:[];
+            for(let i=0;i<Math.min(iTs.length,iC.length);i++){if(typeof iTs[i]!=='number'||typeof iC[i]!=='number')continue;if(!patTs.length||iTs[i]>patTs[patTs.length-1]){patTs.push(iTs[i]);patC.push(iC[i]);}}
+            if(typeof d.phase==='string')patPhase=d.phase;
+            renderPatient();
+            document.getElementById('hdr-status').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }catch(e){}
     }
 
+    function renderPatient(){
+        if(!patTs.length)return;
+        const v=patC[patC.length-1],now=patTs[patTs.length-1];
+        if(!patZoom){pVMinT=patTs[0];pVMaxT=patTs[patTs.length-1];if(pVMaxT<=pVMinT+5000)pVMaxT=pVMinT+120000;}
+
+        const status=getPatientStatus(v,patPhase);
+        const card=document.getElementById('pat-status-card');
+        card.className='pat-status-card '+status.cls;
+        document.getElementById('pat-emoji').textContent=status.emoji;
+        document.getElementById('pat-reading').textContent=v.toFixed(1);
+        document.getElementById('pat-reading').className='pat-reading-big '+status.cls;
+        document.getElementById('pat-headline').textContent=status.headline;
+        document.getElementById('pat-desc').textContent=status.desc;
+
+        const phInfo=PAT_PHASE_INFO[patPhase]||PAT_PHASE_INFO['baseline'];
+        document.getElementById('pat-phase-title').textContent=phInfo.title;
+        document.getElementById('pat-phase-desc').textContent=phInfo.desc;
+
+        const st=getSimTime(patTs.length);
+        if(st){
+            updateSimDisplay(patTs.length);
+            document.getElementById('pat-simtime').textContent='Simulated time: '+st.time+' (Demo mode)';
+            drawPatientCircadian(st.secs);
+        }
+
+        drawPatientChart();drawPatientSpark(now);
+    }
+
+    /* ── Patient chart (clean, no clinical markers) ── */
+    function drawPatientChart(){
+        const canvas=document.getElementById('patient-history-canvas');
+        const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+        const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const W=rect.width,H=rect.height,pL=44,pR=12,pT=12,pB=30,pW=W-pL-pR,pH=H-pT-pB;
+        if(patTs.length<2){ctx.fillStyle=C.muted;ctx.font="13px 'Sora',sans-serif";ctx.textAlign='left';ctx.fillText("Loading…",pL+8,pT+pH/2);return;}
+        let minV=Math.min(...patC)-30,maxV=Math.max(...patC)+30;
+        const rng=pVMaxT-pVMinT;
+        const xOf=t=>pL+((t-pVMinT)/rng)*pW,yOf=v=>pT+(1-(v-minV)/(maxV-minV))*pH;
+
+        // Subtle normal range zone
+        const yHi=yOf(550),yLo=yOf(150);
+        ctx.fillStyle='rgba(21,128,61,0.06)';ctx.fillRect(pL,yHi,pW,yLo-yHi);
+
+        // Grid lines (very subtle)
+        ctx.strokeStyle='rgba(15,23,42,0.04)';ctx.lineWidth=1;
+        for(let i=0;i<=4;i++){const y=yOf(minV+(maxV-minV)*(i/4));ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+pW,y);ctx.stroke();}
+
+        ctx.save();ctx.beginPath();ctx.rect(pL,pT,pW,pH);ctx.clip();
+        ctx.beginPath();ctx.moveTo(xOf(patTs[0]),yOf(patC[0]));
+        for(let i=1;i<patTs.length;i++)ctx.lineTo(xOf(patTs[i]),yOf(patC[i]));
+        ctx.lineTo(xOf(patTs[patTs.length-1]),yOf(minV));ctx.lineTo(xOf(patTs[0]),yOf(minV));ctx.closePath();
+        const g=ctx.createLinearGradient(0,pT,0,pT+pH);
+        g.addColorStop(0,'rgba(21,101,192,0.22)');g.addColorStop(0.6,'rgba(21,101,192,0.06)');g.addColorStop(1,'rgba(21,101,192,0)');
+        ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.moveTo(xOf(patTs[0]),yOf(patC[0]));
+        for(let i=1;i<patTs.length;i++)ctx.lineTo(xOf(patTs[i]),yOf(patC[i]));
+        ctx.strokeStyle='#1565c0';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+        const lx=xOf(patTs[patTs.length-1]),ly=yOf(patC[patC.length-1]);
+        ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fillStyle='#1565c0';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+        ctx.restore();
+
+        ctx.strokeStyle=C.border;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pL,pT);ctx.lineTo(pL,pT+pH);ctx.lineTo(pL+pW,pT+pH);ctx.stroke();
+        ctx.fillStyle=C.muted;ctx.font="10px 'DM Mono',monospace";ctx.textAlign='right';
+        for(let i=0;i<=4;i++)ctx.fillText((minV+(maxV-minV)*(i/4)).toFixed(0),pL-4,yOf(minV+(maxV-minV)*(i/4))+3);
+        ctx.fillStyle=C.muted;ctx.font="10px 'DM Mono',monospace";
+        for(let i=0;i<=4;i++){const t=pVMinT+rng*(i/4),x=xOf(t),lbl=new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ctx.textAlign=i===4?'right':i===0?'left':'center';ctx.fillText(lbl,x,pT+pH+18);}
+    }
+
+    /* ── Patient sparkline ── */
+    function drawPatientSpark(nowMs){
+        const canvas=document.getElementById('patient-spark-canvas');
+        const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+        const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const W=rect.width,H=rect.height;
+        const ts=patTs.filter(t=>t>=nowMs-TWO_H),cor=patC.filter((_,i)=>patTs[i]>=nowMs-TWO_H);
+        if(ts.length<2){ctx.fillStyle=C.muted;ctx.font="11px 'Sora',sans-serif";ctx.textAlign='left';ctx.fillText("Building history…",0,H/2+4);document.getElementById('pat-spark-sub').textContent='Not enough data yet';return;}
+        const minV=Math.min(...cor)-10,maxV=Math.max(...cor)+10,minT=ts[0],maxT=Math.max(ts[ts.length-1],minT+1);
+        const xOf=t=>((t-minT)/(maxT-minT))*W,yOf=v=>H-2-((v-minV)/(maxV-minV))*(H-4);
+        ctx.beginPath();ctx.moveTo(xOf(ts[0]),yOf(cor[0]));for(let i=1;i<ts.length;i++)ctx.lineTo(xOf(ts[i]),yOf(cor[i]));
+        ctx.lineTo(xOf(ts[ts.length-1]),H);ctx.lineTo(0,H);ctx.closePath();
+        const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(21,101,192,0.18)');g.addColorStop(1,'rgba(21,101,192,0)');ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.moveTo(xOf(ts[0]),yOf(cor[0]));for(let i=1;i<ts.length;i++)ctx.lineTo(xOf(ts[i]),yOf(cor[i]));
+        ctx.strokeStyle='#1565c0';ctx.lineWidth=1.8;ctx.lineJoin='round';ctx.stroke();
+        const delta=cor[cor.length-1]-cor[0];
+        const dir=delta>10?'↑ Rising':delta<-10?'↓ Falling':'→ Steady';
+        document.getElementById('pat-spark-sub').textContent=`${dir} · ${delta>=0?'+':''}${delta.toFixed(1)} nmol/L vs 2h ago`;
+    }
+
+    /* ── Patient circadian (friendly labels) ── */
+    function drawPatientCircadian(simSecs){
+        const canvas=document.getElementById('patient-circadian-canvas');if(!canvas)return;
+        const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||600,H=44;
+        canvas.width=W*dpr;canvas.height=H*dpr;const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const DAY=86400,xOf=s=>(s/DAY)*W;
+        ctx.fillStyle='#e2e8f0';ctx.beginPath();ctx.roundRect(0,14,W,14,5);ctx.fill();
+        [[0,21600,'#0f172a'],[21600,25200,'#7c2d12'],[25200,36000,'#b45309'],[36000,50400,'#1565c0'],
+            [50400,52200,'#b91c1c'],[52200,68400,'#1565c0'],[68400,79200,'#334155'],[79200,86400,'#0f172a']
+        ].forEach(([s,e,col])=>{ctx.fillStyle=col;ctx.fillRect(xOf(s),14,Math.max(1,xOf(e)-xOf(s)),14);});
+        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.roundRect(0,14,6,14,[5,0,0,5]);ctx.fill();
+        ctx.beginPath();ctx.roundRect(W-6,14,6,14,[0,5,5,0]);ctx.fill();
+        const nx=Math.min(Math.max(xOf(simSecs%DAY),6),W-6);
+        ctx.fillStyle='#1565c0';
+        ctx.beginPath();ctx.moveTo(nx,28);ctx.lineTo(nx-5,40);ctx.lineTo(nx+5,40);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='bold 7px "Sora",sans-serif';ctx.textAlign='center';
+        ctx.fillText('NOW',Math.min(Math.max(nx,18),W-18),12);
+    }
+
+    /* ── Patient zoom/pan ── */
+    const patCanvas=document.getElementById('patient-history-canvas');
+    patCanvas.addEventListener('wheel',e=>{
+        e.preventDefault();if(patTs.length<2)return;patZoom=true;
+        const rect=patCanvas.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(e.clientX-rect.left-44)/(rect.width-56)));
+        const tAt=pVMinT+ratio*(pVMaxT-pVMinT),range=(pVMaxT-pVMinT)*(e.deltaY>0?1.15:0.87);
+        pVMinT=tAt-ratio*range;pVMaxT=tAt+(1-ratio)*range;
+        if(pVMaxT-pVMinT<10000)pVMaxT=pVMinT+10000;
+        pVMinT=Math.max(pVMinT,patTs[0]-1800000);pVMaxT=Math.min(pVMaxT,patTs[patTs.length-1]+1800000);
+        drawPatientChart();
+    },{passive:false});
+    patCanvas.addEventListener('mousedown',e=>{pDrag=true;pLastX=e.clientX;patCanvas.style.cursor='grabbing';});
+    window.addEventListener('mouseup',()=>{pDrag=false;patCanvas.style.cursor='grab';});
+    window.addEventListener('mousemove',e=>{
+        if(!pDrag||patTs.length<2)return;patZoom=true;
+        const rect=patCanvas.getBoundingClientRect(),tpp=(pVMaxT-pVMinT)/(rect.width-56),shift=(e.clientX-pLastX)*tpp;
+        pVMinT-=shift;pVMaxT-=shift;pLastX=e.clientX;drawPatientChart();
+    });
+    patCanvas.addEventListener('dblclick',()=>{patZoom=false;renderPatient();});
+
+    /* ── Doctor chart ── */
+    const histCanvas=document.getElementById('history-canvas');
+    histCanvas.addEventListener('wheel',e=>{
+        e.preventDefault();if(detTs.length<2)return;zoomCustom=true;
+        const rect=histCanvas.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(e.clientX-rect.left-56)/(rect.width-72)));
+        const tAt=vMinT+ratio*(vMaxT-vMinT),range=(vMaxT-vMinT)*(e.deltaY>0?1.15:0.87);
+        vMinT=tAt-ratio*range;vMaxT=tAt+(1-ratio)*range;
+        if(vMaxT-vMinT<10000)vMaxT=vMinT+10000;
+        vMinT=Math.max(vMinT,detTs[0]-3600000);vMaxT=Math.min(vMaxT,detTs[detTs.length-1]+3600000);
+        drawDetHistory();
+    },{passive:false});
+    histCanvas.addEventListener('mousedown',e=>{dragging=true;lastMX=e.clientX;histCanvas.style.cursor='grabbing';});
+    window.addEventListener('mouseup',()=>{dragging=false;histCanvas.style.cursor='grab';});
+    window.addEventListener('mousemove',e=>{
+        if(!dragging||detTs.length<2)return;zoomCustom=true;
+        const rect=histCanvas.getBoundingClientRect(),tpp=(vMaxT-vMinT)/(rect.width-72),shift=(e.clientX-lastMX)*tpp;
+        vMinT-=shift;vMaxT-=shift;lastMX=e.clientX;drawDetHistory();
+    });
+    histCanvas.addEventListener('dblclick',()=>{zoomCustom=false;renderDet();});
+
+    /* ── Doctor detail fetch & render ── */
     async function fetchDet(){
         if(!curSubject)return;
         try{
@@ -672,8 +936,25 @@
         const rocEl=document.getElementById('d-roc');
         if(detC.length>=60){const roc=detC[detC.length-1]-detC[detC.length-61];rocEl.textContent=(roc>=0?'+':'')+roc.toFixed(1);rocEl.className='d-stat-val '+(roc>20?'roc-up':roc<-20?'roc-down':'roc-flat');}else{rocEl.textContent='—';rocEl.className='d-stat-val';}
         const st=getSimTime(detTs.length);
-        if(st){document.getElementById('d-simtime').textContent='Sim '+st.time+' · Day '+st.day;document.getElementById('d-simday').textContent=st.day;updateSimDisplay(detTs.length);drawCircadianTimeline(st.secs);}
+        if(st){document.getElementById('d-simtime').textContent='Sim '+st.time+' · Day '+st.day;document.getElementById('d-simday').textContent=st.day;updateSimDisplay(detTs.length);drawDocCircadian(st.secs);}
         drawDetHistory();drawDetSpark(now);
+    }
+
+    function drawDocCircadian(simSecs){
+        const canvas=document.getElementById('circadian-canvas');if(!canvas)return;
+        const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||246,H=40;
+        canvas.width=W*dpr;canvas.height=H*dpr;const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+        const DAY=86400,xOf=s=>(s/DAY)*W;
+        ctx.fillStyle='#e2e8f0';ctx.beginPath();ctx.roundRect(0,12,W,12,4);ctx.fill();
+        [[0,21600,'#0f172a'],[21600,25200,'#7c2d12'],[25200,36000,'#b45309'],[36000,50400,'#1565c0'],
+            [50400,52200,'#b91c1c'],[52200,68400,'#1565c0'],[68400,79200,'#334155'],[79200,86400,'#0f172a']
+        ].forEach(([s,e,col])=>{ctx.fillStyle=col;ctx.fillRect(xOf(s),12,Math.max(1,xOf(e)-xOf(s)),12);});
+        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.roundRect(0,12,6,12,[4,0,0,4]);ctx.fill();ctx.beginPath();ctx.roundRect(W-6,12,6,12,[0,4,4,0]);ctx.fill();
+        const nx=Math.min(Math.max(xOf(simSecs%DAY),5),W-5);
+        ctx.fillStyle='#0f172a';ctx.beginPath();ctx.moveTo(nx,25);ctx.lineTo(nx-4.5,34);ctx.lineTo(nx+4.5,34);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='bold 6px "Sora",sans-serif';ctx.textAlign='center';ctx.fillText('NOW',Math.min(Math.max(nx,16),W-16),10);
+        ctx.fillStyle='#94a3b8';ctx.font='7px "DM Mono",monospace';
+        [[0,'00'],[21600,'06'],[43200,'12'],[64800,'18'],[86400,'24']].forEach(([s,l])=>{ctx.textAlign=s===0?'left':s===86400?'right':'center';ctx.fillText(l+':00',xOf(s),40);});
     }
 
     function drawDetHistory(){
@@ -723,95 +1004,12 @@
         const delta=cor[cor.length-1]-cor[0];document.getElementById('d-spark-sub').textContent=`${ts.length} readings · ${delta>=0?'+':''}${delta.toFixed(1)} nmol/L vs 2h ago`;
     }
 
-    const histCanvas=document.getElementById('history-canvas');
-    histCanvas.addEventListener('wheel',e=>{
-        e.preventDefault();if(detTs.length<2)return;zoomCustom=true;
-        const rect=histCanvas.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(e.clientX-rect.left-56)/(rect.width-72)));
-        const tAt=vMinT+ratio*(vMaxT-vMinT),range=(vMaxT-vMinT)*(e.deltaY>0?1.15:0.87);
-        vMinT=tAt-ratio*range;vMaxT=tAt+(1-ratio)*range;
-        if(vMaxT-vMinT<10000)vMaxT=vMinT+10000;
-        vMinT=Math.max(vMinT,detTs[0]-3600000);vMaxT=Math.min(vMaxT,detTs[detTs.length-1]+3600000);
-        drawDetHistory();
-    },{passive:false});
-    histCanvas.addEventListener('mousedown',e=>{dragging=true;lastMX=e.clientX;histCanvas.style.cursor='grabbing';});
-    window.addEventListener('mouseup',()=>{dragging=false;histCanvas.style.cursor='grab';});
-    window.addEventListener('mousemove',e=>{if(!dragging||detTs.length<2)return;zoomCustom=true;const rect=histCanvas.getBoundingClientRect(),tpp=(vMaxT-vMinT)/(rect.width-72),shift=(e.clientX-lastMX)*tpp;vMinT-=shift;vMaxT-=shift;lastMX=e.clientX;drawDetHistory();});
-    histCanvas.addEventListener('dblclick',()=>{zoomCustom=false;renderDet();});
-
     let rszTmr;
-    window.addEventListener('resize',()=>{clearTimeout(rszTmr);rszTmr=setTimeout(()=>{if(document.getElementById('view-detail').style.display!=='none')drawDetHistory();else for(const sid of SUBJECTS){const s=ovStore[sid];if(s&&s.ts.length)drawCardSpark(sid,s.ts,s.cortisol);}},120);});
-
-    // Define users, passwords, and roles
-    const CREDENTIALS = {
-        'dr_smith': { pass: 'doctor123', role: 'doctor' },
-        'patient1': { pass: 'pass1', role: 'patient', subjectId: 'user-1' },
-        'patient2': { pass: 'pass2', role: 'patient', subjectId: 'user-2' },
-        'patient3': { pass: 'pass3', role: 'patient', subjectId: 'user-3' },
-        'patient4': { pass: 'pass4', role: 'patient', subjectId: 'user-4' },
-        'patient5': { pass: 'pass5', role: 'patient', subjectId: 'user-5' },
-        'patient6': { pass: 'pass6', role: 'patient', subjectId: 'user-6' }
-    };
-
-    // Track who is logged in
-    let currentUserRole = null;
-
-    function attemptLogin() {
-        const user = document.getElementById('login-user').value;
-        const pass = document.getElementById('login-pass').value;
-
-        const account = CREDENTIALS[user];
-
-        if (account && account.pass === pass) {
-            // Valid login! Hide login screen, show app
-            document.getElementById('view-login').style.display = 'none';
-            document.getElementById('app-container').style.display = 'flex';
-            document.getElementById('login-err').style.display = 'none';
-
-            currentUserRole = account.role;
-
-            if (account.role === 'doctor') {
-                // DOCTOR SETUP: Show everything, go to overview
-                document.getElementById('btn-back-overview').style.display = 'flex';
-                document.getElementById('card-session-stats').style.display = 'block';
-                buildCards();
-                showOverview();
-            }
-            else if (account.role === 'patient') {
-                // PATIENT SETUP: Hide overview button & stats, go straight to their specific record
-                document.getElementById('btn-back-overview').style.display = 'none';
-                document.getElementById('card-session-stats').style.display = 'none';
-
-                // Change the top right "Doctor" profile to say "Patient"
-                document.querySelector('.doc-avatar').textContent = "Pt";
-                document.querySelector('.doc-name').textContent = "Patient View";
-                document.querySelector('.doc-role').textContent = "Self-Monitoring";
-
-                showDetail(account.subjectId);
-            }
-        } else {
-            // Invalid credentials
-            document.getElementById('login-err').style.display = 'block';
-        }
-    }
-
-    function logout() {
-        // Clear the user role
-        currentUserRole = null;
-
-        // Stop fetching data in the background
-        clearInterval(ovTimer); ovTimer = null;
-        clearInterval(detTimer); detTimer = null;
-
-        // Clear the password field for security
-        document.getElementById('login-pass').value = '';
-
-        // Hide the app and show the login screen
-        document.getElementById('app-container').style.display = 'none';
-        document.getElementById('view-overview').style.display = 'none';
-        document.getElementById('view-detail').style.display = 'none';
-        document.getElementById('view-login').style.display = 'flex';
-        document.getElementById('login-err').style.display = 'none';
-    }
+    window.addEventListener('resize',()=>{clearTimeout(rszTmr);rszTmr=setTimeout(()=>{
+        if(document.getElementById('view-detail').style.display!=='none')drawDetHistory();
+        else if(document.getElementById('view-patient').style.display!=='none')drawPatientChart();
+        else for(const sid of SUBJECTS){const s=ovStore[sid];if(s&&s.ts.length)drawCardSpark(sid,s.ts,s.cortisol);}
+    },120);});
 </script>
 </div>
 </body>
